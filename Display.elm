@@ -65,12 +65,14 @@ makePiece (Piece kind position player) =
     in
         move moveTo <| renderImage kind player
 
+-- everything from here...
 boardPixels (x, y) w h = (x - (w - boardWidth) `div` 2, y - (h - boardHeight) `div` 2)
 console = lift3 boardPixels Mouse.position Window.width Window.height
 
 pieces = map makePiece initialPieces
 
 forms = lift (\c -> (toForm boardImage) :: (toForm . asText <| c) :: pieces) console
+-- to here is pretty damn messy and could use a good cleanup
 
 edgeOffset = 60
 collageBounds = collage (boardWidth + edgeOffset) (boardHeight + edgeOffset)

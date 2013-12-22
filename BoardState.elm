@@ -1,4 +1,5 @@
 module BoardState where
+import Constants (allLetters, soldierLetters)
 
 data Type = Soldier Bool |
             Advisor |
@@ -13,12 +14,12 @@ data Color = Red | Black
 data Piece = Piece Type Position Color
 
 soldier char = Piece (Soldier False) (4, char) Red
-soldiers = map soldier ['a', 'c', 'e', 'g', 'i']
+soldiers = map soldier soldierLetters
 cannons = map (\c -> Piece Cannon (3, c) Red) ['b', 'h']
 
 typeOrder = [Chariot, Horse, Elephant, Advisor]
 fullTypes =  concat [typeOrder, (King :: (reverse typeOrder))]
-typesWithChars = zip fullTypes ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+typesWithChars = zip fullTypes allLetters
 piece (kind, char) = Piece kind (1, char) Red
 rest = map piece typesWithChars
 
