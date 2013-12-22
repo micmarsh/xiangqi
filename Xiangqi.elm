@@ -15,4 +15,10 @@ applyToMiddle = applyTwoArgs middle
 
 windowCentered element = lift (applyToMiddle element) centeredContainer
 
-main = windowCentered boardCanvas
+-- TODO you have two streams one of fns to apply to the other of elements
+-- simple enough, but something's off here, so windowCentered is probably going to
+-- need to take on a new form. That curry chain is actually kind of confusing, need to figure
+-- out a clean way of doing that kind of thing
+
+applyToElt fn elt = fn elt
+main = lift2  applyToElt centeredContainer boardCanvas
