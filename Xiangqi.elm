@@ -15,10 +15,10 @@ applyToMiddle = applyTwoArgs middle
 
 windowCentered element = lift (applyToMiddle element) centeredContainer
 
--- TODO you have two streams one of fns to apply to the other of elements
--- simple enough, but something's off here, so windowCentered is probably going to
--- need to take on a new form. That curry chain is actually kind of confusing, need to figure
--- out a clean way of doing that kind of thing
+-- TODO you've got lift which is basically 'map' for signals, but need a reversed lift that will let
+-- you make a stream out of a stream of functions and a constant
+-- pretty lift (~) looks like what u need call it apply:
+apply functions c = (~) functions (constant c)
 
-applyToElt fn elt = fn elt
-main = lift2  applyToElt centeredContainer boardCanvas
+withMiddle = apply centeredContainer middle
+main = (~)  withMiddle boardCanvas
