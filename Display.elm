@@ -1,46 +1,10 @@
 module Display where
 import BoardState (Piece, Red, Black, initialPieces)
+import Constants (boardWidth, boardHeight, boardImage, squareSize, char2Num, centerWidth, centerHeight, imageName)
 import Window
 import Mouse
+import Input
 
-imageFileSize = [669, 749]
-imageName = "/board.jpg"
-
-
-twoThirds : (Int -> Int)
-twoThirds x = x - (div x 3)
-half x = div x 2
-
-boardSize = map twoThirds imageFileSize
-
-[boardWidth, boardHeight] = boardSize
-boardImage = image boardWidth boardHeight imageName
-
-[centerWidth, centerHeight] = map half boardSize
-
-char2Num char = case char of
-    'a' -> 0
-    'b' -> 1
-    'c' -> 2
-    'd' -> 3
-    'e' -> 4
-    'f' -> 5
-    'g' -> 6
-    'h' -> 7
-    'i' -> 8
-
-num2Char num = case num of
-    0 -> 'a'
-    1 -> 'b'
-    2 -> 'c'
-    3 -> 'd'
-    4 -> 'e'
-    5 -> 'f'
-    6 -> 'g'
-    7 -> 'h'
-    8 -> 'i'
-
-squareSize = div boardWidth 8
 translate2Pixels : ((Int, Char) -> (Int, Int))
 translate2Pixels (row, char) =  let vertIndex = row - 1
                                     horIndex = char2Num char
@@ -65,14 +29,18 @@ makePiece (Piece kind position player) =
     in
         move moveTo <| renderImage kind player
 
--- everything from here...
-boardPixels (x, y) w h = (x - (w - boardWidth) `div` 2, y - (h - boardHeight) `div` 2)
-console = lift3 boardPixels Mouse.position Window.width Window.height
-
 pieces = map makePiece initialPieces
 
-forms = lift (\c -> (toForm boardImage) :: (toForm . asText <| c) :: pieces) console
--- to here is pretty damn messy and could use a good cleanup
+console = Input.boardPixels
+
+realDisplay = (toForm boardImage) :: pieces
+
+displayConsole output = let board = head realDisplay
+                            pieces = tail realDisplay
+                            form = (toForm . asText <| output)
+                        in board :: form :: pieces--(toForm boardImage) ::  :: pieces
+
+forms = lift displayConsole console
 
 edgeOffset = 60
 collageBounds = collage (boardWidth + edgeOffset) (boardHeight + edgeOffset)
