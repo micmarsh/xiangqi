@@ -14,7 +14,7 @@ translate2Pixels (row, char) =  let vertIndex = row - 1
 initialMove (row, col) = ( row - centerWidth, col - centerHeight)
 toFloats (row, col) = (toFloat row, toFloat  col)
 
-pieceRadius = ((toFloat boardWidth) / 16) - 5
+pieceRadius = (((toFloat squareSize) / 2)) - 5
 getColor color = case color of
     Black -> black
     Red -> red
@@ -38,7 +38,7 @@ realDisplay = (toForm boardImage) :: pieces
 displayConsole output = let board = head realDisplay
                             pieces = tail realDisplay
                             -- wtf Y NO destructuring?
-                            form = (toForm . asText <| output)
+                            form = toForm . asText <| output
                         in board :: form :: pieces
 
 forms = lift displayConsole console
