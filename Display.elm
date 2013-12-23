@@ -37,8 +37,9 @@ realDisplay = (toForm boardImage) :: pieces
 
 displayConsole output = let board = head realDisplay
                             pieces = tail realDisplay
+                            -- wtf Y NO destructuring?
                             form = (toForm . asText <| output)
-                        in board :: form :: pieces--(toForm boardImage) ::  :: pieces
+                        in board :: form :: pieces
 
 forms = lift displayConsole console
 
