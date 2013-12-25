@@ -9,7 +9,7 @@ data Type = Soldier Bool |
             Chariot |
             King
 
-type Position = (Int, Char) -- TODO: this should be board-based
+type Position = (Int, Char)
 data Color = Red | Black
 data Piece = Piece Type Position Color
 

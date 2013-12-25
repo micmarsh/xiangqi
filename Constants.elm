@@ -38,11 +38,12 @@ num2Char num = case num of
     7 -> 'h'
     8 -> 'i'
 
-allLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+allRows = range 1 10
 
 range min max = if min < max then min :: range (min + 1) max
                 else []
 
-allColumns = range 1 10
+allColumns = allLetters
 
+allLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
 soldierLetters = ['a', 'c', 'e', 'g', 'i']
