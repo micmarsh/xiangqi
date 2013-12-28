@@ -1,6 +1,8 @@
 module Display where
-import Model (Piece, Red, Black, Color, allPieces)
-import Constants (boardWidth, boardHeight, boardImage, squareSize, char2Num, centerWidth, centerHeight, imageName)
+import Model (King, Chariot, Cannon, Horse, Elephant, Advisor, Soldier,
+    Piece, Red, Black, Color, allPieces)
+import Constants (folder, boardWidth, boardHeight, boardImage, squareSize,
+    char2Num, centerWidth, centerHeight, imageName, pieceImage)
 import GameState (gameState)
 import Window
 import Mouse
@@ -23,13 +25,30 @@ translate2Pixels (char, row) turn =
 
 initialMove (row, col) = ( row - centerWidth, col - centerHeight)
 
--- TODO: this is going to eventually look up the appropriate image and return
--- a form of said image, like an abstracted baws
+pieceName kind = case kind of
+    King -> "king"
+    (Soldier b) -> "soldier"
+    Advisor -> "advisor"
+    Elephant -> "elephant"
+    Cannon -> "cannon"
+    Chariot -> "chariot"
+    Horse -> "horse"
+
+pieceImage kind color =
+    let cfolder = case color of
+            Red -> "/red"
+            Black -> "/black"
+        fullFolder = folder ++ cfolder
+        fullPath = fullFolder ++ "/" ++ (pieceName kind) ++ ".png"
+    in
+        image squareSize squareSize fullPath
+
 pieceRadius = (((toFloat squareSize) / 2)) - 5
-getColor color = case color of
-    Black -> black
-    Red -> red
-renderImage kind player = filled (getColor player) (circle pieceRadius)
+
+-- soon this will just be pieceImage
+renderImage kind player = case player of
+    Red -> pieceImage kind player
+    Black -> image squareSize squareSize "assets/board.jpg"
 
 makePiece : Piece -> Color -> Form
 makePiece (Piece kind position player) turn =
@@ -37,16 +56,16 @@ makePiece (Piece kind position player) turn =
         numPosition = translate2Pixels position turn
         moveTo = ( toFloats . initialMove ) numPosition
     in
-        move moveTo <| renderImage kind player
+        renderImage kind player |> toForm |> move moveTo
 
 pieces = lift .pieces gameState
 
 console = lift .selected gameState
 
 rmap : [a -> b] -> a -> [b]
-rmap functions c =
-    map (\f -> f c) functions
+rmap functions c = map (\f -> f c) functions
 
+imageWithPieces : [Piece] -> Color -> [Form]
 imageWithPieces pieces turn =
     let pieceFns = (map makePiece pieces)
         finalPieces = (rmap pieceFns turn)

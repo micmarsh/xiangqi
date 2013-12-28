@@ -24,6 +24,8 @@ update positions {turn, selected, pieces} =
         option = findPiece pieces position
         (moved, newPieces) = maybeMove selected pieces position
     in {turn = if moved then toggleTurn turn else turn,
-        selected = option, pieces = newPieces}
+        -- shouldn't have anything clicked on for next turn
+        selected = if moved then Nothing else option,
+        pieces = newPieces}
 
 gameState = foldp update initialState (sampleOn Mouse.clicks unifiedPosition)

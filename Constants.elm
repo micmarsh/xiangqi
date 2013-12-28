@@ -1,7 +1,9 @@
 module Constants where
 
 imageFileSize = [669, 749]
-imageName = "/board.jpg"
+
+folder = "assets"
+imageName = folder ++ "/board.jpg"
 
 
 twoThirds : (Int -> Int)
