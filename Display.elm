@@ -5,21 +5,21 @@ import Window
 import Mouse
 import Input
 
-translate2Pixels : ((Int, Char) -> (Int, Int))
-translate2Pixels (row, char) =  let vertIndex = row - 1
+translate2Pixels : ((Char, Int) -> (Int, Int))
+translate2Pixels (char, row) =  let vertIndex = row - 1
                                     horIndex = char2Num char
                                 in
                                     (horIndex * squareSize, vertIndex * squareSize)
 
 initialMove (row, col) = ( row - centerWidth, col - centerHeight)
-toFloats (row, col) = (toFloat row, toFloat  col)
+toFloats (fst, snd) = (toFloat fst, toFloat  snd)
 
+-- TODO: this is going to eventually look up the appropriate image and return
+-- a form of said image, like an abstracted baws
 pieceRadius = (((toFloat squareSize) / 2)) - 5
 getColor color = case color of
     Black -> black
     Red -> red
--- TODO: this is going to eventually look up the appropriate image and return
--- a form of said image, like an abstracted baws
 renderImage kind player = filled (getColor player) (circle pieceRadius)
 
 makePiece (Piece kind position player) =

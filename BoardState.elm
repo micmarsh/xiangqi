@@ -9,23 +9,23 @@ data Type = Soldier Bool |
             Chariot |
             King
 
-type Position = (Int, Char)
+type Position = (Char, Int)
 data Color = Red | Black
 data Piece = Piece Type Position Color
 
-soldier char = Piece (Soldier False) (4, char) Red
+soldier char = Piece (Soldier False) (char, 4) Red
 soldiers = map soldier soldierLetters
-cannons = map (\c -> Piece Cannon (3, c) Red) ['b', 'h']
+cannons = map (\c -> Piece Cannon (c, 3) Red) ['b', 'h']
 
 typeOrder = [Chariot, Horse, Elephant, Advisor]
 fullTypes =  concat [typeOrder, (King :: (reverse typeOrder))]
 typesWithChars = zip fullTypes allLetters
-piece (kind, char) = Piece kind (1, char) Red
+piece (kind, char) = Piece kind (char, 1) Red
 rest = map piece typesWithChars
 
 redPieces = concat [soldiers, cannons, rest]
 
-makeBlack (Piece kind (row, col) c) = Piece kind (11 - row, col) Black
+makeBlack (Piece kind (col, row) c) = Piece kind (col, 11 - row) Black
 blackPieces = map makeBlack redPieces
 
 initialPieces = concat [redPieces, blackPieces]
