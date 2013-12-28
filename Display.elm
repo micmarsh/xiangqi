@@ -1,6 +1,7 @@
 module Display where
 import Model (Piece, Red, Black, allPieces, findPiece)
 import Constants (boardWidth, boardHeight, boardImage, squareSize, char2Num, centerWidth, centerHeight, imageName)
+import GameState (gameState)
 import Window
 import Mouse
 import Input
@@ -31,7 +32,7 @@ makePiece (Piece kind position player) =
 
 pieces = map makePiece allPieces
 
-console = lift (findPiece allPieces) Input.redBoardPosition
+console = gameState
 
 realDisplay = (toForm boardImage) :: pieces
 
