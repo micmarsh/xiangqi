@@ -31,7 +31,7 @@ makePiece (Piece kind position player) =
 
 pieces = map makePiece initialPieces
 
-console = Input.boardPosition
+console = Input.blackBoardPosition
 
 realDisplay = (toForm boardImage) :: pieces
 
