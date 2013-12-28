@@ -19,8 +19,7 @@ toBoardRow player pixels = case player of
                             Black -> let blackOffset = heightOffset * 2
                                          newPixels = pixels + blackOffset
                                      in (div newPixels squareSize) + 1
-                        -- TODO these both need to be shifted a little bit in their respective directions,
-                        -- for more accuracy as to what you're actually pressing
+
 toBoardColumn player pixels = case player of
                             Red -> num2Char <| div (pixels + widthOffset) squareSize
                             Black -> let newWidth = boardWidth + widthOffset

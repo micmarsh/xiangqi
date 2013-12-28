@@ -10,8 +10,8 @@ centeredContainer = lift2 container Window.width Window.height
 apply : Signal (a -> b) -> a  -> Signal b
 apply functions c = functions ~ (constant c)
 
-columnForms = flow right <| map asText allColumns
-boardWithColumns = lift (\c -> flow down [c, columnForms]) boardCanvas
+--columnForms = flow right <| map asText allColumns
+--boardWithColumns = lift (\c -> flow down [c, columnForms]) boardCanvas
 
 inMiddle = apply centeredContainer middle
-main =  inMiddle ~ boardWithColumns
+main =  inMiddle ~ boardCanvas --boardWithColumns
