@@ -22,9 +22,7 @@ toggleTurn turn = case turn of
 update positions {turn, selected, pieces} =
     let position = currentPos positions turn
         option = findPiece pieces position
-        moveResult = maybeMove selected pieces position
-        moved = fst moveResult
-        newPieces = snd moveResult
+        (moved, newPieces) = maybeMove selected pieces position
     in {turn = if moved then toggleTurn turn else turn,
         selected = option, pieces = newPieces}
 
