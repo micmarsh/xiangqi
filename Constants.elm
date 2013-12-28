@@ -26,6 +26,7 @@ char2Num char = case char of
     'g' -> 6
     'h' -> 7
     'i' -> 8
+    _ -> 0
 
 num2Char num = case num of
     0 -> 'a'
@@ -37,6 +38,7 @@ num2Char num = case num of
     6 -> 'g'
     7 -> 'h'
     8 -> 'i'
+    _ -> 'a'
 
 allRows = range 1 10
 
