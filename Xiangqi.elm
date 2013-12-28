@@ -8,6 +8,7 @@ import Constants (allLetters, allColumns)
 centeredContainer : (Signal  (Position -> Element -> Element))
 centeredContainer = lift2 container Window.width Window.height
 
+apply : Signal (a -> b) -> a  -> Signal b
 apply functions c = functions ~ (constant c)
 
 columnForms = flow right <| map asText allColumns
