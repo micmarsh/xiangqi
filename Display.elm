@@ -1,19 +1,27 @@
 module Display where
-import Model (Piece, Red, Black, allPieces)
+import Model (Piece, Red, Black, Color, allPieces)
 import Constants (boardWidth, boardHeight, boardImage, squareSize, char2Num, centerWidth, centerHeight, imageName)
 import GameState (gameState)
 import Window
 import Mouse
 import Input
 
-translate2Pixels : ((Char, Int) -> (Int, Int))
-translate2Pixels (char, row) =  let vertIndex = row - 1
-                                    horIndex = char2Num char
-                                in
-                                    (horIndex * squareSize, vertIndex * squareSize)
+tmap : (a -> b) -> (a, a) -> (b, b)
+tmap fn (one, two) =
+    (fn one, fn two)
+toFloats = tmap toFloat
+
+translate2Pixels : (Char, Int) -> Color -> (Int, Int)
+translate2Pixels (char, row) turn =
+    let vertIndex = row - 1
+        horIndex = char2Num char
+        defaultHeight = vertIndex * squareSize
+        defaultWidth = horIndex * squareSize
+    in case turn of
+        Red -> (defaultWidth, defaultHeight)
+        Black -> (boardWidth - defaultWidth, boardHeight - defaultHeight)
 
 initialMove (row, col) = ( row - centerWidth, col - centerHeight)
-toFloats (fst, snd) = (toFloat fst, toFloat  snd)
 
 -- TODO: this is going to eventually look up the appropriate image and return
 -- a form of said image, like an abstracted baws
@@ -23,9 +31,10 @@ getColor color = case color of
     Red -> red
 renderImage kind player = filled (getColor player) (circle pieceRadius)
 
-makePiece (Piece kind position player) =
+makePiece : Piece -> Color -> Form
+makePiece (Piece kind position player) turn =
     let
-        numPosition = translate2Pixels position
+        numPosition = translate2Pixels position turn
         moveTo = ( toFloats . initialMove ) numPosition
     in
         move moveTo <| renderImage kind player
@@ -34,7 +43,16 @@ pieces = lift .pieces gameState
 
 console = lift .selected gameState
 
-realDisplay = lift (\ps -> (toForm boardImage) :: (map makePiece ps)) pieces
+rmap : [a -> b] -> a -> [b]
+rmap functions c =
+    map (\f -> f c) functions
+
+imageWithPieces pieces turn =
+    let pieceFns = (map makePiece pieces)
+        finalPieces = (rmap pieceFns turn)
+    in (toForm boardImage) :: finalPieces
+
+realDisplay = lift2 imageWithPieces pieces <| .turn <~ gameState
 
 displayConsole output display =
             let board = head display

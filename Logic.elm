@@ -1,5 +1,5 @@
 module Logic (maybeMove) where
-import Model (Piece, Position)
+import Model (Piece, Position, findPiece)
 
 type MoveCheck = (Piece, [Piece], Position)
 type MoveResult = (Bool, [Piece])
@@ -15,7 +15,11 @@ move : MoveCheck -> MoveResult
 move ((Piece t oldPos c), pieces, position) =
     let removeOld = remove pieces (Piece t oldPos c)
         newPiece = Piece t position c
-    in (True, newPiece :: removeOld)
+        option = findPiece removeOld position
+        removeCaptured = case option of
+            Nothing -> removeOld
+            (Just captured) -> remove removeOld captured
+    in (True, newPiece :: removeCaptured)
 
 
 maybeMove : Maybe Piece -> [Piece] -> Position -> MoveResult
