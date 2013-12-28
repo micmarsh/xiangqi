@@ -1,5 +1,5 @@
 module Display where
-import Model (Piece, Red, Black, allPieces, findPiece)
+import Model (Piece, Red, Black, allPieces)
 import Constants (boardWidth, boardHeight, boardImage, squareSize, char2Num, centerWidth, centerHeight, imageName)
 import GameState (gameState)
 import Window
@@ -30,19 +30,20 @@ makePiece (Piece kind position player) =
     in
         move moveTo <| renderImage kind player
 
-pieces = map makePiece allPieces
+pieces = lift .pieces gameState
 
-console = gameState
+console = lift .selected gameState
 
-realDisplay = (toForm boardImage) :: pieces
+realDisplay = lift (\ps -> (toForm boardImage) :: (map makePiece ps)) pieces
 
-displayConsole output = let board = head realDisplay
-                            pieces = tail realDisplay
-                            -- wtf Y NO destructuring?
-                            form = toForm . asText <| output
-                        in board :: form :: pieces
+displayConsole output display =
+            let board = head display
+                pieces = tail display
+                -- wtf Y NO destructuring?
+                form = toForm . asText <| output
+            in board :: form :: pieces
 
-forms = lift displayConsole console
+forms = lift2 displayConsole console realDisplay
 
 edgeOffset = 60
 collageBounds = collage (boardWidth + edgeOffset) (boardHeight + edgeOffset)

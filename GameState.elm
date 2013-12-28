@@ -1,5 +1,6 @@
 module GameState where
 import Model (Color, Red, Black, Position, Piece, allPieces, findPiece)
+import Logic (maybeMove)
 import Input
 import Mouse
 
@@ -14,9 +15,17 @@ currentPos positions turn = case turn of
     Red -> positions.red
     Black -> positions.black
 
+toggleTurn turn = case turn of
+    Red -> Black
+    Black -> Red
+
 update positions {turn, selected, pieces} =
     let position = currentPos positions turn
-        piece = findPiece pieces position
-    in {turn = turn, selected = piece, pieces = pieces}
+        option = findPiece pieces position
+        moveResult = maybeMove selected pieces position
+        moved = fst moveResult
+        newPieces = snd moveResult
+    in {turn = if moved then toggleTurn turn else turn,
+        selected = option, pieces = newPieces}
 
 gameState = foldp update initialState (sampleOn Mouse.clicks unifiedPosition)
