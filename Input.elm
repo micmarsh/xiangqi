@@ -1,6 +1,6 @@
 module Input (redBoardPosition, blackBoardPosition) where
 import Constants (boardWidth, boardHeight, squareSize, num2Char)
-import BoardState (Black, Red)
+import Model (Black, Red)
 import Mouse
 import Window
 

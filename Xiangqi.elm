@@ -1,8 +1,7 @@
 module Xianqi where
-
+import Constants (allLetters, allColumns)
 import Display (boardCanvas)
 import Window
-import Constants (allLetters, allColumns)
 --allLetters is probably better dealt with somewhere where u can reverse their direction
 
 centeredContainer : (Signal  (Position -> Element -> Element))

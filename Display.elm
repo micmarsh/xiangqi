@@ -1,5 +1,5 @@
 module Display where
-import BoardState (Piece, Red, Black, initialPieces)
+import Model (Piece, Red, Black, allPieces, findPiece)
 import Constants (boardWidth, boardHeight, boardImage, squareSize, char2Num, centerWidth, centerHeight, imageName)
 import Window
 import Mouse
@@ -29,9 +29,9 @@ makePiece (Piece kind position player) =
     in
         move moveTo <| renderImage kind player
 
-pieces = map makePiece initialPieces
+pieces = map makePiece allPieces
 
-console = Input.blackBoardPosition
+console = lift (findPiece allPieces) Input.redBoardPosition
 
 realDisplay = (toForm boardImage) :: pieces
 
