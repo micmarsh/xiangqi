@@ -4,7 +4,7 @@ import Logic (maybeMove)
 import Input
 import Mouse
 
-type State = {turn : Color, selected: Maybe Piece, pieces: [Piece]}
+type State = {turn : Color, selected : Maybe Piece, pieces : [Piece]}
 initialState = {turn = Red, selected = Nothing, pieces = allPieces}
 
 type Positions = {red: Position, black: Position}
