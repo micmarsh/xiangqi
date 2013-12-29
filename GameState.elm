@@ -1,6 +1,7 @@
 module GameState where
 import Model (Color, Red, Black, Position, Piece, allPieces, findPiece, State)
 import Logic (maybeMove)
+import Parser
 import Input
 import Mouse
 
@@ -13,7 +14,7 @@ posRecord red black = {red = red, black = black}
 unifiedPosition : Signal Positions
 unifiedPosition = lift2 posRecord Input.redBoardPosition Input.blackBoardPosition
 
-currentPos : Positions Color -> Position
+currentPos : Positions -> Color -> Position
 currentPos positions turn = case turn of
     Red -> positions.red
     Black -> positions.black
