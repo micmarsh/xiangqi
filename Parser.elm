@@ -13,7 +13,7 @@ encodeMove (from, to) =
     in "{\"type\":\"move\",\"from\":\"" ++ fromStr ++ "\",\"to\":\"" ++ toStr ++ "\"}"
 
 decodeMove : String -> Maybe Move
-decodeMove str = map object2Move (fromString str)
+decodeMove str = map object2Move <| fromString str
 
 object2Move : JsonValue -> Move
 object2Move json =
@@ -28,7 +28,7 @@ pos2String : Position -> String
 pos2String pair =
     let (col, int) = pair
         row = int2Str int
-    in (cons col (cons ','  row))
+    in cons col <| cons ',' row
 
 chars2Pos : [Char] -> Position
 chars2Pos chars =
