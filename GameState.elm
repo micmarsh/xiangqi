@@ -1,7 +1,6 @@
 module GameState where
 import Model (Color, Red, Black, Position, Piece, allPieces, findPiece, State)
 import Logic (maybeMove)
-import Parser
 import Input
 import Mouse
 
