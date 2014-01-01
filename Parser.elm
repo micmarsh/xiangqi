@@ -1,42 +1,46 @@
 module Parser where
-import Model (Color, Black, Red, Piece, State, Position,
+import Model (Color, Black, Red, Piece, State, Position, Move,
     Soldier, Advisor, Elephant, Horse, Cannon, Chariot, King)
-import String (cons)
-import Json (toString, fromJSObject)
-import JavaScript.Experimental (fromRecord)
+import String (cons, toInt, toList, fromList)
+import Json (fromString, toJSObject, JsonValue)
+import JavaScript.Experimental (toRecord)
+import Monad (map)
 
--- encodeGameState : State -> String
-encodeGameState = (toString " ") . fromJSObject . fromRecord . gameState2Record
+encodeMove : Move -> String
+encodeMove (from, to) =
+    let fromStr = pos2String from
+        toStr = pos2String to
+    in "{\"type\":\"move\",\"from\":\"" ++ fromStr ++ "\",\"to\":\"" ++ toStr ++ "\"}"
 
-gameState2Record : State -> {turn : String, selected: [String], pieces: [[String]]}
-gameState2Record {turn, selected, pieces} =
-    let strTurn = encodeColor turn
-        strSelect = option2Record selected
-        strPieces = map piece2Record pieces
-    in {turn = strTurn, selected = strSelect, pieces = strPieces}
+decodeMove : String -> Maybe Move
+decodeMove str = map object2Move (fromString str)
 
-encodeColor color =
-    case color of
-        Black -> "Black"
-        Red -> "Red"
-
-option2Record : Maybe Piece -> [String]
-option2Record option = case option of
-    Nothing -> []
-    Just piece -> piece2Record piece
-
-piece2Record : Piece -> [String]
-piece2Record (Piece kind position player) =
-    let strType = type2String kind
-        strPos = pos2String position
-        strColor = encodeColor player
-    in [strType, strPos, strColor]
+object2Move : JsonValue -> Move
+object2Move json =
+    let  jsObj = toJSObject json
+         record = toRecord jsObj
+         {from, to} = record
+         start = string2Pos from
+         end = string2Pos to
+     in (start, end)
 
 pos2String : Position -> String
 pos2String pair =
     let (col, int) = pair
         row = int2Str int
     in (cons col (cons ','  row))
+
+chars2Pos : [Char] -> Position
+chars2Pos chars =
+    let char = head chars
+        numStr = (tail . tail) chars |> fromList
+        number = case (toInt numStr) of
+                    Nothing -> -1
+                    Just num -> num
+    in (char, number)
+
+string2Pos : String -> Position
+string2Pos = chars2Pos . toList
 
 int2Str : Int -> String
 int2Str int =
@@ -52,12 +56,3 @@ int2Str int =
         9 -> "9"
         10 -> "10"
 
-type2String adt =
-    case adt of
-        (Soldier bool) -> "Soldier|" ++ if bool then "True" else "False"
-        Advisor -> "Advisor"
-        Elephant -> "Elephant"
-        Horse -> "Horse"
-        Cannon -> "Cannon"
-        Chariot -> "Chariot"
-        King -> "King"

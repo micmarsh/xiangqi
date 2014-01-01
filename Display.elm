@@ -4,7 +4,6 @@ import Model (King, Chariot, Cannon, Horse, Elephant, Advisor, Soldier,
 import Constants (folder, boardWidth, boardHeight, boardImage, squareSize,
     char2Num, centerWidth, centerHeight, imageName, pieceImage)
 import GameState (gameState)
-import Parser (encodeGameState)
 import Window
 import Mouse
 import Input
@@ -61,7 +60,7 @@ makePiece (Piece kind position player) turn =
 
 pieces = lift .pieces gameState
 
-console = lift encodeGameState gameState
+console = constant "lulz"
 
 rmap : [a -> b] -> a -> [b]
 rmap functions c = map (\f -> f c) functions

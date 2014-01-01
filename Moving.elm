@@ -1,5 +1,6 @@
-module Logic (maybeMove) where
+module Moving (maybeMove) where
 import Model (Piece, Position, findPiece)
+import Parser (encodeMove)
 
 type MoveCheck = (Piece, [Piece], Position)
 type MoveResult = (Bool, [Piece])
