@@ -39,14 +39,20 @@ getMove positions {turn, selected, pieces} =
     let position = currentPos positions turn
     in map (\(Piece t fromPos c) -> (fromPos, position)) selected
 
+maybeMoves : Signal (Maybe Move)
 maybeMoves = foldp getMove initialState (sampleOn Mouse.clicks unifiedPosition)
 
 defaultMove = Just (('a',1), ('i',10))
-moves = keepIf maybe2Bool defaultMove maybeMoves |> lift (\o -> case o of Just thing -> thing)
-
+-- warning, only use get when u know fo shizzle that you'll have a value
+get : Maybe a -> a
+get option = case option of
+    Just value -> value
 maybe2Bool option = case option of
     Nothing -> False
     Just thing -> True
+
+moves : Signal Move
+moves = keepIf maybe2Bool defaultMove maybeMoves |> lift get
 
 gameState : Signal State
 gameState = foldp update initialState (sampleOn Mouse.clicks unifiedPosition)
