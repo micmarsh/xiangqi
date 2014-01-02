@@ -34,25 +34,15 @@ update positions {turn, selected, pieces} =
         selected = if moved then Nothing else option,
         pieces = newPieces}
 
-getMove : Positions -> State -> Maybe Move
-getMove positions {turn, selected, pieces} =
-    let position = currentPos positions turn
-    in map (\(Piece t fromPos c) -> (fromPos, position)) selected
+getMove : Positions -> (Maybe Move, State) -> (Maybe Move, State)
+getMove positions (oldMove, gameState) =
+    let {selected, turn} = gameState
+        position = currentPos positions turn
+        newMove = map (\(Piece t fromPos c) -> (fromPos, position)) selected
+    in (newMove, gameState)
 
-maybeMoves : Signal (Maybe Move)
-maybeMoves = foldp getMove initialState (sampleOn Mouse.clicks unifiedPosition)
-
-defaultMove = Just (('a',1), ('i',10))
--- warning, only use get when u know fo shizzle that you'll have a value
-get : Maybe a -> a
-get option = case option of
-    Just value -> value
-maybe2Bool option = case option of
-    Nothing -> False
-    Just thing -> True
-
-moves : Signal Move
-moves = keepIf maybe2Bool defaultMove maybeMoves |> lift get
+maybeMoves : Signal (Maybe Move, State)
+maybeMoves = foldp getMove (Nothing, initialState) (sampleOn Mouse.clicks unifiedPosition)
 
 gameState : Signal State
 gameState = foldp update initialState (sampleOn Mouse.clicks unifiedPosition)
