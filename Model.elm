@@ -14,7 +14,7 @@ type Move = (Position, Position)
 data Color = Red | Black
 data Piece = Piece Type Position Color
 
-type State = {turn : Color, selected : Maybe Piece, pieces : [Piece]}
+type State = {turn : Color, pieces : [Piece]}
 
 soldier char = Piece (Soldier False) (char, 4) Red
 soldiers = map soldier soldierLetters
@@ -34,9 +34,10 @@ blackPieces = map makeBlack redPieces
 allPieces = concat [redPieces, blackPieces]
 
 findPiece : [Piece] -> Position -> Maybe Piece
-findPiece pieces position = case pieces of
-                            [] -> Nothing
-                            (Piece t p c) :: rest ->
-                                -- destructuring in lets is broken as poop, pull down fix sometime
-                                if (position == p) then Just (Piece t p c)
-                                else findPiece rest position
+findPiece pieces position =
+    case pieces of
+        [] -> Nothing
+        (Piece t p c) :: rest ->
+            -- destructuring in lets is broken as poop, pull down fix sometime
+            if (position == p) then Just (Piece t p c)
+            else findPiece rest position

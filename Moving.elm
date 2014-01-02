@@ -1,12 +1,9 @@
-module Moving (maybeMove) where
+module Moving where
 import Model (Piece, Position, findPiece)
 import Parser (encodeMove)
 
 type MoveCheck = (Piece, [Piece], Position)
 type MoveResult = (Bool, [Piece])
---this is going to have some real logic in it at some point
-moveIsLegal : MoveCheck -> Bool
-moveIsLegal (piece, pieces, position) = True
 
 remove : [a] -> a -> [a]
 remove list element = filter (\e -> not <| e == element) list
@@ -23,13 +20,9 @@ move ((Piece t oldPos c), pieces, position) =
     in (True, newPiece :: removeCaptured)
 
 
-maybeMove : Maybe Piece -> [Piece] -> Position -> MoveResult
-maybeMove option pieces position =
+makeMove : Maybe Piece -> [Piece] -> Position -> MoveResult
+makeMove option pieces position =
     let noMove = (False, pieces)
     in case option of
         Nothing -> noMove
-        (Just piece) ->
-            let checker = (piece, pieces, position)
-            in if moveIsLegal checker then move checker
-                else noMove
-
+        (Just piece) -> move (piece, pieces, position)

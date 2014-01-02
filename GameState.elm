@@ -1,54 +1,65 @@
 module GameState where
 import Model (Color, Red, Black, Position, Piece, allPieces, findPiece, State, Move)
-import Moving (maybeMove)
+import Moving (makeMove)
 import WebSocket (connect)
 import Monad (map)
 import Parser
 import Input
 import Mouse
 
+-- wooooo! this signal will either be somehting "unsafe" OR
+-- just a straight signal to a "/register", get a color assignment
+-- and Id, homie
+playerInfo = constant (Red, "yoyoyoId")
+
+playerColor = lift fst playerInfo
+gameId = lift snd playerInfo
+
 initialState : State
-initialState = {turn = Red, selected = Nothing, pieces = allPieces}
+initialState = {turn = Red, pieces = allPieces}
 
-type Positions = {red: Position, black: Position}
-posRecord : Position -> Position -> Positions
-posRecord red black = {red = red, black = black}
-unifiedPosition : Signal Positions
-unifiedPosition = lift2 posRecord Input.redBoardPosition Input.blackBoardPosition
+choosePos : Color -> Position -> Position -> Position
+choosePos player redPos blackPos =
+    case player of
+        Red -> redPos
+        Black -> blackPos
 
-currentPos : Positions -> Color -> Position
-currentPos positions turn = case turn of
-    Red -> positions.red
-    Black -> positions.black
+mousePosition : Signal Position
+mousePosition = lift3 choosePos playerColor Input.redBoardPosition Input.blackBoardPosition
+
+clickPosition = sampleOn Mouse.clicks mousePosition
+
+updateMove : Position -> Move -> Move
+updateMove position (from, to) = (to, position)
+initialMove = (('h',11), ('h',11))
+
+moves = foldp updateMove initialMove clickPosition
+
+serverMoveMessage gameId moveData =
+    "{\"gameId\":\""++gameId++"\",\"message\":\""++moveData++"\"}"
+
+movesToCheck = lift2 serverMoveMessage gameId <| lift Parser.encodeMove moves
+
+serverLocation = "ws://localhost:8000/move"
+
+legalMoves = lift Parser.decodeMove <| connect serverLocation movesToCheck
 
 toggleTurn : Color -> Color
 toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
 
-update : Positions -> State -> State
-update positions {turn, selected, pieces} =
-    let position = currentPos positions turn
-        option = findPiece pieces position
-        (moved, newPieces) = maybeMove selected pieces position
-    in {turn = if moved then toggleTurn turn else turn,
-        -- shouldn't have anything clicked on for next turn
-        selected = if moved then Nothing else option,
-        pieces = newPieces}
-
-getMove : Positions -> (Maybe Move, State) -> (Maybe Move, State)
-getMove positions (oldMove, gameState) =
-    let {selected, turn} = gameState
-        position = currentPos positions turn
-        newMove = map (\(Piece t fromPos c) -> (fromPos, position)) selected
-    in (newMove, gameState)
-
--- the sample on clicks should merge with sockets, so both can do stuff. Need to mod uni-pos again, then
-maybeMoves : Signal (Maybe Move, State)
-maybeMoves = foldp getMove (Nothing, initialState) (sampleOn Mouse.clicks unifiedPosition)
-
-encodeMove : Maybe Move -> Maybe String
-encodeMove option = map Parser.encodeMove option
+update : Maybe Move -> State -> State
+update moveOption state =
+    case moveOption of
+        Nothing -> state
+        Just move ->
+            let {turn, pieces} = state
+                (from, to) = move
+                pieceOption = findPiece pieces from
+                (moved, newPieces) = makeMove pieceOption pieces to
+            in {turn = if moved then toggleTurn turn else turn,
+                pieces = newPieces}
 
 gameState : Signal State
-gameState = foldp update initialState (sampleOn Mouse.clicks unifiedPosition)
+gameState = foldp update initialState legalMoves
