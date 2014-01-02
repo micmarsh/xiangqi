@@ -1,7 +1,9 @@
 module GameState where
 import Model (Color, Red, Black, Position, Piece, allPieces, findPiece, State, Move)
 import Moving (maybeMove)
+import WebSocket (connect)
 import Monad (map)
+import Parser
 import Input
 import Mouse
 
@@ -41,8 +43,12 @@ getMove positions (oldMove, gameState) =
         newMove = map (\(Piece t fromPos c) -> (fromPos, position)) selected
     in (newMove, gameState)
 
+-- the sample on clicks should merge with sockets, so both can do stuff. Need to mod uni-pos again, then
 maybeMoves : Signal (Maybe Move, State)
 maybeMoves = foldp getMove (Nothing, initialState) (sampleOn Mouse.clicks unifiedPosition)
+
+encodeMove : Maybe Move -> Maybe String
+encodeMove option = map Parser.encodeMove option
 
 gameState : Signal State
 gameState = foldp update initialState (sampleOn Mouse.clicks unifiedPosition)

@@ -32,3 +32,4 @@ maybeMove option pieces position =
             let checker = (piece, pieces, position)
             in if moveIsLegal checker then move checker
                 else noMove
+
