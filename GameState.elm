@@ -7,13 +7,22 @@ import Parser
 import Input
 import Mouse
 
--- wooooo! this signal will either be somehting "unsafe" OR
--- just a straight signal to a "/register", get a color assignment
--- and Id, homie
-playerInfo = constant (Red, "yoyoyoId")
+-- wooooo! this ID should eventually come from
+-- a magical custom from-the-dom signal that
+-- pulls from the current route
+gameId = constant "yoyoyoId"
 
-playerColor = lift fst playerInfo
-gameId = lift snd playerInfo
+playerADT color =
+    case color of
+        "red" -> Red
+        "black" -> Black
+        _ -> Red
+
+messageData gameId player =
+    "{\"gameId\":\""++gameId++"\",\"player\":\""++player++"\""
+idWithData = lift2 (\g p -> (messageData g p) ++ "}") gameId (constant "red")
+
+playerColor = lift playerADT <| connect "ws://localhost:8008/register" idWithData
 
 initialState : State
 initialState = {turn = Red, pieces = allPieces}
@@ -35,12 +44,18 @@ initialMove = (('h',11), ('h',11))
 
 moves = foldp updateMove initialMove clickPosition
 
-serverMoveMessage gameId moveData =
-    "{\"gameId\":\""++gameId++"\",\"message\":\""++moveData++"\"}"
+serverMoveMessage gameId player moveData =
+    let firstPart = messageData gameId player
+    in firstPart ++ ",\"message\":"++moveData++"}"
 
-movesToCheck = lift2 serverMoveMessage gameId <| lift Parser.encodeMove moves
+colorString player =
+    case player of
+        Black -> "black"
+        Red -> "red"
 
-serverLocation = "ws://localhost:8000/move"
+movesToCheck = lift3 serverMoveMessage gameId (lift colorString playerColor) <| lift Parser.encodeMove moves
+
+serverLocation = "ws://localhost:8008/move"
 
 legalMoves = lift Parser.decodeMove <| connect serverLocation movesToCheck
 
