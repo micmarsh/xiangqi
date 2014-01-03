@@ -3,10 +3,7 @@ module Monad where
 type M a = Maybe a
 
 map : (a -> b) -> M a -> M b
-map fn monad =
-    case monad of
-        Nothing -> Nothing
-        Just thing -> fn thing |> Just
+map fn monad = flatmap (\v -> Just (fn v)) monad
 
 filter : (a -> Bool) -> M a -> M a
 filter fn monad =
