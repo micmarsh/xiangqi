@@ -3,6 +3,7 @@ import Model (Color, Red, Black, Position, Piece, allPieces, findPiece, State, M
 import Moving (makeMove)
 import WebSocket (connect)
 import Monad (map)
+import Http (Success, Waiting, Failure, sendGet)
 import Parser
 import Input
 import Mouse
@@ -10,7 +11,7 @@ import Mouse
 -- wooooo! this ID should eventually come from
 -- a magical custom from-the-dom signal that
 -- pulls from the current route
-gameId = constant "yoyoyoId"
+gameId = constant "id123"
 
 playerADT color =
     case color of
@@ -18,11 +19,15 @@ playerADT color =
         "black" -> Black
         _ -> Red
 
-messageData gameId player =
-    "{\"gameId\":\""++gameId++"\",\"player\":\""++player++"\""
-idWithData = lift2 (\g p -> (messageData g p) ++ "}") gameId (constant "red")
+playerRequest = sendGet (lift (\id -> "http://localhost:8008/" ++ id) gameId)
 
-playerColor = lift playerADT <| connect "ws://localhost:8008/register" idWithData
+parseResponse response =
+    case response of
+        Success color -> color
+        Waiting -> "none"
+        Failure code message -> message
+
+playerColor = lift (playerADT . parseResponse) <| playerRequest
 
 initialState : State
 initialState = {turn = Red, pieces = allPieces}
@@ -44,6 +49,9 @@ initialMove = (('h',11), ('h',11))
 
 moves = foldp updateMove initialMove clickPosition
 
+messageData gameId player =
+    "{\"gameId\":\""++gameId++"\",\"player\":\""++player++"\""
+
 serverMoveMessage gameId player moveData =
     let firstPart = messageData gameId player
     in firstPart ++ ",\"message\":"++moveData++"}"
@@ -55,9 +63,7 @@ colorString player =
 
 movesToCheck = lift3 serverMoveMessage gameId (lift colorString playerColor) <| lift Parser.encodeMove moves
 
-serverLocation = "ws://localhost:8008/move"
-
-legalMoves = lift Parser.decodeMove <| connect serverLocation movesToCheck
+legalMoves = lift Parser.decodeMove <| connect "ws://localhost:8008/move" movesToCheck
 
 toggleTurn : Color -> Color
 toggleTurn turn = case turn of
