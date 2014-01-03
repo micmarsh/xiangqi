@@ -22,7 +22,8 @@ heroku = True
 serverName = if heroku then "glacial-island-4986.herokuapp.com" else "localhost:8008"
 server = "://"++serverName++"/"
 
-playerRequest = sendGet (lift (\id -> "http" ++ server ++ id) gameId)
+http = "http" ++ if heroku then "s" else ""
+playerRequest = sendGet (lift (\id -> http ++ server ++ id) gameId)
 
 parseResponse response =
     case response of
