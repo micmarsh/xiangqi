@@ -17,26 +17,26 @@ playerADT color =
     case color of
         "red" -> Red
         "black" -> Black
-        _ -> Red
 
 playerRequest = sendGet (lift (\id -> "http://localhost:8008/" ++ id) gameId)
 
 parseResponse response =
     case response of
-        Success color -> color
-        Waiting -> "none"
-        Failure code message -> message
+        Success color -> Just color
+        Waiting -> Nothing
+        Failure code message -> Nothing
 
-playerColor = lift (playerADT . parseResponse) <| playerRequest
+playerColor = lift ((map playerADT) . parseResponse) playerRequest
 
 initialState : State
 initialState = {turn = Red, pieces = allPieces}
 
-choosePos : Color -> Position -> Position -> Position
+choosePos : Maybe Color -> Position -> Position -> Position
 choosePos player redPos blackPos =
     case player of
-        Red -> redPos
-        Black -> blackPos
+        Just Red -> redPos
+        Just Black -> blackPos
+        Nothing -> ('h', 11)
 
 mousePosition : Signal Position
 mousePosition = lift3 choosePos playerColor Input.redBoardPosition Input.blackBoardPosition
@@ -58,14 +58,14 @@ serverMoveMessage gameId player moveData =
 
 colorString player =
     case player of
-        Black -> "black"
-        Red -> "red"
+        Just Black -> "black"
+        Just Red -> "red"
+        Nothing -> "none"
 
 movesToCheck = lift3 serverMoveMessage gameId (lift colorString playerColor) <| lift Parser.encodeMove moves
 
 legalMoves = lift Parser.decodeMove <| connect "ws://localhost:8008/move" movesToCheck
 
-toggleTurn : Color -> Color
 toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
