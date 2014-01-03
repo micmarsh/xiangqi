@@ -27,7 +27,8 @@ decodeMetadata json =
 object2Move : JsonValue -> Move
 object2Move json =
     let  jsObj = toJSObject json
-         {from, to} = toRecord jsObj
+         {message} = toRecord jsObj
+         {from, to} = message
          start = string2Pos from
          end = string2Pos to
      in (start, end)
