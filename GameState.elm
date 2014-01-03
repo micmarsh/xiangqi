@@ -18,7 +18,9 @@ playerADT color =
         "red" -> Red
         "black" -> Black
 
-heroku = False
+-- TODO this shit can totally be part of a more general "url" signal that
+-- you provide, that we can derive ID from as well
+heroku = True
 serverName = if heroku then "glacial-island-4986.herokuapp.com" else "localhost:8008"
 server = "://"++serverName++"/"
 http = "http" ++ if heroku then "s" else ""
