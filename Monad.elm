@@ -1,7 +1,8 @@
 module Monad where
 
+type M a = Maybe a
 
-map : (a -> b) -> Maybe a -> Maybe b
+map : (a -> b) -> M a -> M b
 map fn monad =
     case monad of
         Nothing -> Nothing
