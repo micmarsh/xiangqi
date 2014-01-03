@@ -85,8 +85,9 @@ update moveOption state =
                 (from, to) = move
                 pieceOption = findPiece pieces from
                 moved = isLegal pieceOption mData
-            in  {turn = if moved then toggleTurn turn else turn,
-                pieces = if moved then makeMove pieceOption pieces to else pieces}
+            in if not moved then state
+                else {turn = toggleTurn turn,
+                      pieces = makeMove pieceOption pieces to}
 
 gameState : Signal State
 gameState = foldp update initialState allMoves
