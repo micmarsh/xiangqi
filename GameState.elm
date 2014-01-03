@@ -18,11 +18,11 @@ playerADT color =
         "red" -> Red
         "black" -> Black
 
-heroku = True
+heroku = False
 serverName = if heroku then "glacial-island-4986.herokuapp.com" else "localhost:8008"
 server = "://"++serverName++"/"
-
 http = "http" ++ if heroku then "s" else ""
+
 playerRequest = sendGet (lift (\id -> http ++ server ++ id) gameId)
 
 parseResponse response =
