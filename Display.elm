@@ -3,7 +3,7 @@ import Model (King, Chariot, Cannon, Horse, Elephant, Advisor, Soldier,
     Piece, Red, Black, Color, allPieces)
 import Constants (folder, boardWidth, boardHeight, boardImage, squareSize,
     char2Num, centerWidth, centerHeight, imageName, pieceImage)
-import GameState (gameState)
+import GameState (gameState, playerColor)
 import Window
 import Mouse
 import Input
@@ -13,15 +13,16 @@ tmap fn (one, two) =
     (fn one, fn two)
 toFloats = tmap toFloat
 
-translate2Pixels : (Char, Int) -> Color -> (Int, Int)
+translate2Pixels : (Char, Int) -> Maybe Color -> (Int, Int)
 translate2Pixels (char, row) turn =
     let vertIndex = row - 1
         horIndex = char2Num char
         defaultHeight = vertIndex * squareSize
         defaultWidth = horIndex * squareSize
     in case turn of
-        Red -> (defaultWidth, defaultHeight)
-        Black -> (boardWidth - defaultWidth, boardHeight - defaultHeight)
+        Nothing -> (defaultWidth, defaultHeight)
+        Just Red -> (defaultWidth, defaultHeight)
+        Just Black -> (boardWidth - defaultWidth, boardHeight - defaultHeight)
 
 initialMove (row, col) = ( row - centerWidth, col - centerHeight)
 
@@ -50,7 +51,7 @@ renderImage kind player = case player of
     Red -> pieceImage kind player
     Black -> image squareSize squareSize "assets/board.jpg"
 
-makePiece : Piece -> Color -> Form
+makePiece : Piece -> Maybe Color -> Form
 makePiece (Piece kind position player) turn =
     let
         numPosition = translate2Pixels position turn
@@ -60,18 +61,18 @@ makePiece (Piece kind position player) turn =
 
 pieces = lift .pieces gameState
 
-console = constant "lulz"
+console = lift .turn gameState
 
 rmap : [a -> b] -> a -> [b]
 rmap functions c = map (\f -> f c) functions
 
-imageWithPieces : [Piece] -> Color -> [Form]
+imageWithPieces : [Piece] -> Maybe Color -> [Form]
 imageWithPieces pieces turn =
     let pieceFns = (map makePiece pieces)
         finalPieces = (rmap pieceFns turn)
     in (toForm boardImage) :: finalPieces
 
-realDisplay = lift2 imageWithPieces pieces <| .turn <~ gameState
+realDisplay = lift2 imageWithPieces pieces <| playerColor
 
 displayConsole output display =
             let board = head display

@@ -64,23 +64,30 @@ colorString player =
 
 movesToCheck = lift3 serverMoveMessage gameId (lift colorString playerColor) <| lift Parser.encodeMove moves
 
-legalMoves = lift Parser.decodeMove <| connect "ws://localhost:8008/move" movesToCheck
+allMoves = lift Parser.decodeMove <| connect "ws://localhost:8008/move" movesToCheck
+
+isLegal : Maybe Piece -> Parser.Metadata -> Bool
+isLegal piece {player} =
+    case piece of
+        Nothing -> False
+        (Just (Piece t p color)) -> color == playerADT player
 
 toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
 
-update : Maybe Move -> State -> State
+update : Maybe (Move, Parser.Metadata) -> State -> State
 update moveOption state =
     case moveOption of
         Nothing -> state
-        Just move ->
+        Just (move, mData)->
             let {turn, pieces} = state
                 (from, to) = move
                 pieceOption = findPiece pieces from
-                (moved, newPieces) = makeMove pieceOption pieces to
-            in {turn = if moved then toggleTurn turn else turn,
+                moved = isLegal pieceOption mData
+                newPieces = makeMove pieceOption pieces to
+            in  {turn = if moved then toggleTurn turn else turn,
                 pieces = newPieces}
 
 gameState : Signal State
-gameState = foldp update initialState legalMoves
+gameState = foldp update initialState allMoves

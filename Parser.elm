@@ -6,20 +6,28 @@ import Json (fromString, toJSObject, JsonValue)
 import JavaScript.Experimental (toRecord)
 import Monad (map)
 
+type Metadata = {gameId : String, player: String}
+
 encodeMove : Move -> String
 encodeMove (from, to) =
     let fromStr = pos2String from
         toStr = pos2String to
     in "{\"type\":\"move\",\"from\":\"" ++ fromStr ++ "\",\"to\":\"" ++ toStr ++ "\"}"
 
-decodeMove : String -> Maybe Move
-decodeMove str = map object2Move <| fromString str
+decodeMove : String -> Maybe (Move, Metadata)
+decodeMove str =
+    map (\j -> (object2Move j, decodeMetadata j)) <| fromString str
+
+decodeMetadata : JsonValue -> Metadata
+decodeMetadata json =
+    let jsObj = toJSObject json
+        {gameId, player} = toRecord jsObj
+    in {gameId = gameId, player = player}
 
 object2Move : JsonValue -> Move
 object2Move json =
     let  jsObj = toJSObject json
-         record = toRecord jsObj
-         {from, to} = record
+         {from, to} = toRecord jsObj
          start = string2Pos from
          end = string2Pos to
      in (start, end)

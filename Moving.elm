@@ -3,7 +3,7 @@ import Model (Piece, Position, findPiece)
 import Parser (encodeMove)
 
 type MoveCheck = (Piece, [Piece], Position)
-type MoveResult = (Bool, [Piece])
+type MoveResult = [Piece]
 
 remove : [a] -> a -> [a]
 remove list element = filter (\e -> not <| e == element) list
@@ -17,12 +17,12 @@ move ((Piece t oldPos c), pieces, position) =
         removeCaptured = case option of
             Nothing -> removedOld
             (Just captured) -> remove removedOld captured
-    in (True, newPiece :: removeCaptured)
+    in newPiece :: removeCaptured
 
 
 makeMove : Maybe Piece -> [Piece] -> Position -> MoveResult
 makeMove option pieces position =
-    let noMove = (False, pieces)
-    in case option of
-        Nothing -> noMove
-        (Just piece) -> move (piece, pieces, position)
+    case option of
+        Nothing -> pieces
+        (Just piece) ->
+            move (piece, pieces, position)
