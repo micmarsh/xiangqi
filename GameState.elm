@@ -18,7 +18,11 @@ playerADT color =
         "red" -> Red
         "black" -> Black
 
-playerRequest = sendGet (lift (\id -> "http://localhost:8008/" ++ id) gameId)
+heroku = True
+serverName = if heroku then "glacial-island-4986.herokuapp.com" else "localhost:8008"
+server = "://"++serverName++"/"
+
+playerRequest = sendGet (lift (\id -> "http" ++ server ++ id) gameId)
 
 parseResponse response =
     case response of
@@ -64,7 +68,7 @@ colorString player =
 
 movesToCheck = lift3 serverMoveMessage gameId (lift colorString playerColor) <| lift Parser.encodeMove moves
 
-allMoves = lift Parser.decodeMove <| connect "ws://localhost:8008/move" movesToCheck
+allMoves = lift Parser.decodeMove <| connect ("ws" ++ server ++ "move") movesToCheck
 
 isLegal : Maybe Piece -> Parser.Metadata -> Bool
 isLegal piece {player} =
