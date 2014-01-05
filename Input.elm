@@ -1,8 +1,17 @@
-module Input (redBoardPosition, blackBoardPosition) where
+module Input (redBoardPosition, blackBoardPosition, urlHash, urlHost) where
 import Constants (boardWidth, boardHeight, squareSize, num2Char)
 import Model (Black, Red)
 import Mouse
 import Window
+import JavaScript (fromString, toString, JSString)
+
+foreign import jsevent "hash"
+    (fromString "")
+    hash : Signal JSString
+
+foreign import jsevent "host"
+    (fromString "")
+    host : Signal JSString
 
 toBoardPixels (x, y) w h = let yToBoard = (h - boardHeight) `div` 2
                                xToBoard = (w - boardWidth) `div` 2
@@ -30,3 +39,6 @@ toBoardPosition player (x, y) = (toBoardColumn player x, toBoardRow player y)
 
 redBoardPosition = lift (toBoardPosition Red) boardPixels
 blackBoardPosition = lift (toBoardPosition Black) boardPixels
+
+urlHash = lift toString hash
+urlHost = lift toString host

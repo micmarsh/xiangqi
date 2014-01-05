@@ -9,10 +9,9 @@
 </head>
 
 <body>
-</body>
-
 
 <script>
+
 function isGame(id) {
     return typeof id === 'string' && id.length === 5;
 }
@@ -22,19 +21,19 @@ function newId() {
 
 var currentId = location.hash.slice(1); //to get rid of the "#"
 
-if (!isGame(currentId)){
+if (!isGame(currentId)) {
     location.hash = '#' + newId();
 }
 
-(function startGame() {
-    console.log("woah maybe starting game: "+Elm.Xiangqi);
-    if (!!Elm.Xiangqi) {
-        Elm.fullscreen(Elm.Xiangqi);
-    } else {
-        setTimeout(startGame, 1000);
-    }
-})()
+//TODO all this shit probably needs to be in its own elm module, but first look and little more and ask somewhere about how exactly to roll native things (maybe that native events thingy would be helpful, even though that neccesitates doing stuff here too)
+
+var app = Elm.fullscreen(Elm.Xiangqi);
+
+app.send('host', location.host);
+app.send('hash', location.hash);
 
 </script>
+
+</body>
 
 </html>

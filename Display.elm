@@ -8,6 +8,10 @@ import Window
 import Mouse
 import Input
 
+-- WTF who knows why this isn't showing up properly maybe U just can't do that with strings?
+-- either way, review the material a little more
+
+
 tmap : (a -> b) -> (a, a) -> (b, b)
 tmap fn (one, two) =
     (fn one, fn two)
@@ -61,7 +65,7 @@ makePiece (Piece kind position player) turn =
 
 pieces = lift .pieces gameState
 
-console = lift .turn gameState
+console = lift2 (,) Input.urlHost Input.urlHash
 
 rmap : [a -> b] -> a -> [b]
 rmap functions c = map (\f -> f c) functions
