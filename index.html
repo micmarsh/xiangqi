@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Xiangqi</title>
+  <script type="text/javascript" src="build/elm-runtime.js"></script>
+  <script type="text/javascript" src="build/Xiangqi.js"></script>
+</head>
+
+<body>
+</body>
+
+
+<script>
+function isGame(id) {
+    return typeof id === 'string' && id.length === 5;
+}
+function newId() {
+    return Math.random().toString(36).substring(3,8);
+}
+
+var currentId = location.hash.slice(1); //to get rid of the "#"
+
+if (!isGame(currentId)){
+    location.hash = '#' + newId();
+}
+
+(function startGame() {
+    console.log("woah maybe starting game: "+Elm.Xiangqi);
+    if (!!Elm.Xiangqi) {
+        Elm.fullscreen(Elm.Xiangqi);
+    } else {
+        setTimeout(startGame, 1000);
+    }
+})()
+
+</script>
+
+</html>

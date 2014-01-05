@@ -19,7 +19,7 @@ playerADT color =
         "black" -> Black
 
 -- TODO this shit can totally be part of a more general "url" signal that
--- you provide, that we can derive ID from as well
+-- you prtovide, that we can derive ID from as well
 heroku = False
 serverName = if heroku then "glacial-island-4986.herokuapp.com" else "localhost:8008"
 server = "://"++serverName++"/"
@@ -48,7 +48,7 @@ choosePos player redPos blackPos =
 mousePosition : Signal Position
 mousePosition = lift3 choosePos playerColor Input.redBoardPosition Input.blackBoardPosition
 
-clickPosition = sampleOn (merge Mouse.clicks (lift (\b -> ()) Mouse.isDown)) mousePosition
+clickPosition = sampleOn Mouse.clicks mousePosition
 
 updateMove : Position -> Move -> Move
 updateMove position (from, to) = (to, position)
