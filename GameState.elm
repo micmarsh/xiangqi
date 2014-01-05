@@ -7,19 +7,22 @@ import Http (Success, Waiting, Failure, sendGet)
 import Parser
 import Input
 import Mouse
+import String
+
 
 -- wooooo! this ID should eventually come from
 -- a magical custom from-the-dom signal that
 -- pulls from the current route
-gameId = constant "id123"
+gameId = lift (String.fromList . tail . String.toList) Input.urlHash
 
 playerADT color =
     case color of
         "red" -> Red
         "black" -> Black
+        _ -> Red
 
 -- TODO this shit can totally be part of a more general "url" signal that
--- you prtovide, that we can derive ID from as well
+-- you prtovide, that we can derive ID from as well, once u get a sflatten type thing
 heroku = False
 serverName = if heroku then "glacial-island-4986.herokuapp.com" else "localhost:8008"
 server = "://"++serverName++"/"

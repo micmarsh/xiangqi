@@ -6,7 +6,7 @@ import Window
 import JavaScript (fromString, toString, JSString)
 
 foreign import jsevent "hash"
-    (fromString "")
+    (fromString "#")
     hash : Signal JSString
 
 foreign import jsevent "host"

@@ -8,10 +8,6 @@ import Window
 import Mouse
 import Input
 
--- WTF who knows why this isn't showing up properly maybe U just can't do that with strings?
--- either way, review the material a little more
-
-
 tmap : (a -> b) -> (a, a) -> (b, b)
 tmap fn (one, two) =
     (fn one, fn two)
