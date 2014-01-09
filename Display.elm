@@ -46,10 +46,10 @@ pieceImage kind color =
 
 pieceRadius = (((toFloat squareSize) / 2)) - 5
 
--- soon this will just be pieceImage
-renderImage kind player = case player of
-    Red -> pieceImage kind player
-    Black -> image squareSize squareSize "assets/board.jpg"
+---- soon this will just be pieceImage
+--renderImage kind player = case player of
+--    Red -> pieceImage kind player
+--    Black -> image squareSize squareSize "assets/board.jpg"
 
 makePiece : Piece -> Maybe Color -> Form
 makePiece (Piece kind position player) turn =
@@ -57,11 +57,11 @@ makePiece (Piece kind position player) turn =
         numPosition = translate2Pixels position turn
         moveTo = ( toFloats . initialMove ) numPosition
     in
-        renderImage kind player |> toForm |> move moveTo
+        pieceImage kind player |> toForm |> move moveTo
 
 pieces = lift .pieces gameState
 
-console = lift2 (,) Input.urlHost Input.urlHash
+console = lift .turn gameState --lift2 (,) Input.urlHost Input.urlHash
 
 rmap : [a -> b] -> a -> [b]
 rmap functions c = map (\f -> f c) functions
