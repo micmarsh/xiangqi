@@ -46,11 +46,6 @@ pieceImage kind color =
 
 pieceRadius = (((toFloat squareSize) / 2)) - 5
 
----- soon this will just be pieceImage
---renderImage kind player = case player of
---    Red -> pieceImage kind player
---    Black -> image squareSize squareSize "assets/board.jpg"
-
 makePiece : Piece -> Maybe Color -> Form
 makePiece (Piece kind position player) turn =
     let
