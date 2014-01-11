@@ -1,5 +1,6 @@
 module Constants where
 
+sideBarWidth = 200
 imageFileSize = [669, 749]
 
 folder = "assets"

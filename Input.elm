@@ -1,5 +1,5 @@
 module Input (redBoardPosition, blackBoardPosition, urlHash, urlHost) where
-import Constants (boardWidth, boardHeight, squareSize, num2Char)
+import Constants (boardWidth, boardHeight, squareSize, num2Char, sideBarWidth)
 import Model (Black, Red)
 import Mouse
 import Window
@@ -14,7 +14,7 @@ foreign import jsevent "host"
     host : Signal JSString
 
 toBoardPixels (x, y) w h = let yToBoard = (h - boardHeight) `div` 2
-                               xToBoard = (w - boardWidth) `div` 2
+                               xToBoard = (w - (boardWidth + sideBarWidth)) `div` 2
                            in (x - xToBoard, y - yToBoard)
 boardPixels = lift3 toBoardPixels Mouse.position Window.width Window.height
 
