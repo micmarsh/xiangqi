@@ -86,22 +86,29 @@ toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
 
-update : (Maybe (Move, Parser.Metadata), Position )-> State -> State
+selectPiece : State -> Position -> State
+selectPiece state clickPos =
+    let {pieces} = state
+    in {state |
+        selected = findPiece pieces clickPos
+    }
+
+handleLegalMove : State -> (Move, Parser.Metadata) -> State
+handleLegalMove state (move, mData) =
+  let {turn, pieces} = state
+      (from, to) = move
+      mightMove = findPiece pieces from
+      moved = isLegal mightMove mData
+    in if not moved then state
+        else {turn = toggleTurn turn,
+              pieces = makeMove mightMove pieces to,
+              selected = Nothing}
+
+update : (Maybe (Move, Parser.Metadata), Position) -> State -> State
 update (moveOption, clickPos) state =
     case moveOption of
-        Nothing -> let {pieces} = state
-                   in {state |
-                        selected = findPiece pieces clickPos
-                    }
-        Just (move, mData)->
-            let {turn, pieces} = state
-                (from, to) = move
-                mightMove = findPiece pieces from
-                moved = isLegal mightMove mData
-            in if not moved then state
-                else {turn = toggleTurn turn,
-                      pieces = makeMove mightMove pieces to,
-                      selected = Nothing}
+        Nothing -> selectPiece state clickPos
+        Just move -> handleLegalMove state move
 
 gameState : Signal State
 gameState = foldp update initialState <| lift2 (,) allMoves clickPosition
