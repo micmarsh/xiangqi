@@ -39,7 +39,7 @@ parseResponse response =
 playerColor = lift ((map playerADT) . parseResponse) playerRequest
 
 initialState : State
-initialState = {turn = Red, pieces = allPieces}
+initialState = {turn = Red, pieces = allPieces, selected = Nothing}
 
 choosePos : Maybe Color -> Position -> Position -> Position
 choosePos player redPos blackPos =
@@ -86,18 +86,22 @@ toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
 
-update : Maybe (Move, Parser.Metadata) -> State -> State
-update moveOption state =
+update : (Maybe (Move, Parser.Metadata), Position )-> State -> State
+update (moveOption, clickPos) state =
     case moveOption of
-        Nothing -> state
+        Nothing -> let {pieces} = state
+                   in {state |
+                        selected = findPiece pieces clickPos
+                    }
         Just (move, mData)->
             let {turn, pieces} = state
                 (from, to) = move
-                pieceOption = findPiece pieces from
-                moved = isLegal pieceOption mData
+                mightMove = findPiece pieces from
+                moved = isLegal mightMove mData
             in if not moved then state
                 else {turn = toggleTurn turn,
-                      pieces = makeMove pieceOption pieces to}
+                      pieces = makeMove mightMove pieces to,
+                      selected = Nothing}
 
 gameState : Signal State
-gameState = foldp update initialState allMoves
+gameState = foldp update initialState <| lift2 (,) allMoves clickPosition

@@ -56,7 +56,7 @@ makePiece (Piece kind position player) turn =
 
 pieces = lift .pieces gameState
 
-console = lift .turn gameState --lift2 (,) Input.urlHost Input.urlHash
+console = lift .selected gameState --lift2 (,) Input.urlHost Input.urlHash
 
 rmap : [a -> b] -> a -> [b]
 rmap functions c = map (\f -> f c) functions
