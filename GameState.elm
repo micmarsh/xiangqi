@@ -87,8 +87,8 @@ toggleTurn turn = case turn of
     Black -> Red
 
 selectPiece : State -> Position -> State
-selectPiece state clickPos = {state |
-        selected = findPiece state.pieces clickPos
+selectPiece state clickPos = { state |
+        selected <- findPiece state.pieces clickPos
     }
 
 handleLegalMove : State -> (Move, Parser.Metadata) -> State
