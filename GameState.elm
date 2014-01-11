@@ -39,7 +39,7 @@ parseResponse response =
 playerColor = lift ((map playerADT) . parseResponse) playerRequest
 
 initialState : State
-initialState = {turn = Red, pieces = allPieces, selected = Nothing}
+initialState = {turn = Red, pieces = allPieces, selected = Nothing, moved = False}
 
 choosePos : Maybe Color -> Position -> Position -> Position
 choosePos player redPos blackPos =
@@ -66,6 +66,7 @@ serverMoveMessage gameId player moveData =
     let firstPart = messageData gameId player
     in firstPart ++ ",\"message\":"++moveData++"}"
 
+colorString : Maybe Color -> String
 colorString player =
     case player of
         Just Black -> "black"
@@ -73,8 +74,8 @@ colorString player =
         Nothing -> "none"
 
 movesToCheck = lift3 serverMoveMessage gameId (lift colorString playerColor) <| lift Parser.encodeMove moves
-
-allMoves = lift Parser.decodeMove <| connect ("ws" ++ server ++ "move") movesToCheck
+socketConnection = connect ("ws" ++ server ++ "move") movesToCheck
+allMoves = lift Parser.decodeMove socketConnection
 
 isLegal : Maybe Piece -> Parser.Metadata -> Bool
 isLegal piece {player} =
@@ -88,7 +89,8 @@ toggleTurn turn = case turn of
 
 selectPiece : State -> Position -> State
 selectPiece state clickPos = { state |
-        selected <- findPiece state.pieces clickPos
+        selected <- if state.moved then Nothing
+                    else findPiece state.pieces clickPos
     }
 
 handleLegalMove : State -> (Move, Parser.Metadata) -> State
@@ -97,16 +99,20 @@ handleLegalMove state (move, mData) =
       (from, to) = move
       mightMove = findPiece pieces from
       moved = isLegal mightMove mData
-    in if not moved then state
+    in if not moved then { state | moved <- False}
         else {turn = toggleTurn turn,
               pieces = makeMove mightMove pieces to,
-              selected = Nothing}
+              selected = Nothing,
+              moved = True}
 
-update : (Maybe (Move, Parser.Metadata), Position) -> State -> State
-update (moveOption, clickPos) state =
+update : Maybe (Move, Parser.Metadata) -> State -> State
+update moveOption state =
     case moveOption of
-        Nothing -> selectPiece state clickPos
+        Nothing -> state
         Just move -> handleLegalMove state move
 
+onlyMoves : Signal State
+onlyMoves = foldp update initialState allMoves
+
 gameState : Signal State
-gameState = foldp update initialState <| lift2 (,) allMoves clickPosition
+gameState = lift2 selectPiece onlyMoves clickPosition

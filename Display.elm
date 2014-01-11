@@ -3,7 +3,7 @@ import Model (King, Chariot, Cannon, Horse, Elephant, Advisor, Soldier,
     Piece, Red, Black, Color, allPieces)
 import Constants (folder, boardWidth, boardHeight, boardImage, squareSize,
     char2Num, centerWidth, centerHeight, imageName, pieceImage)
-import GameState (gameState, playerColor)
+import GameState (gameState, playerColor, socketConnection)
 import Window
 import Mouse
 import Input
@@ -56,7 +56,7 @@ makePiece (Piece kind position player) turn =
 
 pieces = lift .pieces gameState
 
-console = lift .selected gameState --lift2 (,) Input.urlHost Input.urlHash
+console = lift .selected gameState
 
 rmap : [a -> b] -> a -> [b]
 rmap functions c = map (\f -> f c) functions
