@@ -9,10 +9,6 @@ import Input
 import Mouse
 import String
 
-
--- wooooo! this ID should eventually come from
--- a magical custom from-the-dom signal that
--- pulls from the current route
 gameId = lift (String.fromList . tail . String.toList) Input.urlHash
 
 playerADT color =
