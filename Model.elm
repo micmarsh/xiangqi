@@ -41,3 +41,9 @@ findPiece pieces position =
             -- destructuring in lets is broken as poop, pull down fix sometime
             if (position == p) then Just (Piece t p c)
             else findPiece rest position
+
+playerADT color =
+    case color of
+        "red" -> Red
+        "black" -> Black
+        _ -> Red

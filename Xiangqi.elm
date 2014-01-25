@@ -1,12 +1,12 @@
 module Xiangqi where
 import Constants (allLetters, allColumns)
---import Board (boardCanvas)
+import Board (makeBoard)
 --import Sidebar (sidebar)
 import GameState (makeMoves, makeGame)
 import Window
 
 port color : Signal String
-port inMoves : Signal {legal : Bool, {from : String, to : String}}
+port inMoves : Signal {legal: Bool, move: {from: String, to: String}}
 
 inputs = {
         color = color,
@@ -19,13 +19,19 @@ port outMoves = makeMoves inputs
 gameState = makeGame inputs
 
 
---centeredContainer : (Signal  (Position -> Element -> Element))
---centeredContainer = lift2 container Window.width Window.height
+centeredContainer : (Signal  (Position -> Element -> Element))
+centeredContainer = lift2 container Window.width Window.height
 
---rlift : Signal (a -> b) -> a  -> Signal b
---rlift functions c = functions ~ (constant c)
+rlift : Signal (a -> b) -> a  -> Signal b
+rlift functions c = functions ~ (constant c)
 
---toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
+boardCanvas = makeBoard gameState color
 
---inMiddle = rlift centeredContainer middle
-main = lift asText <| lift2 (,) moves gameState
+sidebar = constant <| asText "wooo"
+
+toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
+
+inMiddle : Signal (Element -> Element)
+inMiddle = rlift centeredContainer middle
+
+main = inMiddle ~ toDisplay--lift asText <| lift2 (,) outMoves gameState

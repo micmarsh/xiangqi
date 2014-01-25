@@ -1,5 +1,6 @@
 module GameState where
-import Model (Color, Red, Black, Position, Piece, allPieces, findPiece, State, Move)
+import Model (Color, Red, Black, Position, Piece,
+    allPieces, findPiece, State, Move, playerADT)
 import Moving (makeMove)
 import Monad (map)
 import Http (Success, Waiting, Failure, sendGet)
@@ -9,12 +10,6 @@ import Input
 import Mouse
 import String
 
-
-playerADT color =
-    case color of
-        "red" -> Red
-        "black" -> Black
-        _ -> Red
 
 --playerRequest = sendGet (lift3 (\http server id -> http ++ server ++ id) http server gameId)
 
@@ -70,6 +65,8 @@ handleLegalMove  {move, legal} state =
               selected = Nothing,
               moved = True}
 
+type ParsedMove = {legal: Bool, move: {from:String, to:String}}
+convertMoveRecord : ParsedMove -> {legal:Bool, move: Move}
 convertMoveRecord confirm = {confirm |
         move <- decodeMove confirm.move
     }
@@ -78,9 +75,9 @@ toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
 
-makeGame {color, confirmations} =
-    let moves = lift convertMoveRecord confirmations
-        onlyMoves = foldp handleLegalMove initialState moves
+makeGame {color, moves} =
+    let boardMoves = lift convertMoveRecord moves
+        onlyMoves = foldp handleLegalMove initialState boardMoves
         clickPosition = makeClicks color
     in lift2 selectPiece onlyMoves clickPosition
 
