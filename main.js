@@ -1,26 +1,21 @@
 
 var checker = require('./lib/xiangcheck.js');
+var info = require('./initialize.js');
 
-function isGame(id) {
-    return typeof id === 'string' && id.length === 5;
-}
-function newId() {
-    return Math.random().toString(36).substring(3,8);
-}
-
-var currentId = location.hash.slice(1); //to get rid of the "#"
-var playerColor = "black";
-
-if (!isGame(currentId)) {
-    location.hash = currentId = '#' + newId();
-    playerColor = "red";
-}
+var playerColor = info.color;
+var id = info.id;
+var history = info.history;
 
 var sampleShit = {from: '0,0', to: '2,3'};
 var app = Elm.fullscreen(Elm.Xiangqi, {
     color: playerColor,
     inMoves: {legal: false, move: sampleShit}
 });
+
+for (var i in history) {
+    var move = history[i];
+    app.ports.inMoves.send({legal:true, move: move});
+}
 
 app.ports.state.subscribe(function (state) {
     var pieces = state.pieces;
