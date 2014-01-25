@@ -4,7 +4,7 @@ import Model (Color, Black, Red, Piece, State, Position, Move,
 import String (cons, toInt, toList, fromList)
 import Json (fromString, toJSObject, JsonValue)
 import JavaScript.Experimental (toRecord)
-import Constants (char2Num)
+import Constants (char2Num, num2Char)
 import Monad (map)
 
 type Metadata = {gameId : String, player: String}
@@ -22,13 +22,18 @@ pos2String pair =
         intCol = (int2Str . char2Num) col
     in (++) intCol <| cons ',' row
 
+unpack option =
+    case option of
+        Nothing -> -1
+        Just num -> num
+
 chars2Pos : [Char] -> Position
 chars2Pos chars =
-    let char = head chars
+    let colStr = take 1 chars |> fromList
+        col = unpack <| toInt colStr
         numStr = drop 2 chars |> fromList
-        number = case (toInt numStr) of
-                    Nothing -> -1
-                    Just num -> num
+        number = unpack <| toInt numStr
+        char = num2Char col
     in (char, number)
 
 string2Pos : String -> Position
