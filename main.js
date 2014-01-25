@@ -29,10 +29,11 @@ var peerId = 'xiangqi-'+playerColor+id;
 var otherId = 'xiangqi-'+otherPlayer+id;
 var peer = new Peer(peerId, {key: '51am0fffupb0ggb9'});
 
-var connection = peer.connect(otherId);
+var connection;
 
 app.ports.outMoves.subscribe(function (move) {
     var legal = checker.isLegal(move, playerColor);
+    console.log(connection.open);
     if (legal && connection.open) {
         connection.send({
             move: move,
@@ -43,34 +44,36 @@ app.ports.outMoves.subscribe(function (move) {
     }
 });
 
-connection.on('data', receiveData);
-
-peer.on('connection', function (conn) {
-    console.log('received other dude\'s connection');
-    conn.on('data', receiveData);
-})
-
 function pushToGame (data) {
+    console.log('adding data to game '+JSON.stringify(data));
     delete data.color;
     app.ports.inMoves.send(data);
 }
-function receiveData (data) {
-    var move = data.move;
-    var color = data.color;
-    var legal = data.legal || false;
-    if(color !== playerColor) {
-        console.log("checking someone else's move");
-        legal = checker.isLegal(move, color);
-        conn.send({
-            move: move,
-            color: color,
-            legal: legal
-        });
-        if(legal) {
-            checker.setTurn(playerColor);
-        }
-    } else { console.log("got ur move back"); }
-    pushToGame(data);
+function receiveData (conn) {
+    return function (data) {
+        if(data.color !== playerColor) {
+            console.log("checking someone else's move");
+            data.legal = checker.isLegal(data.move, data.color);
+            conn.send(data);
+            if(data.legal) {
+                checker.setTurn(playerColor);
+            }
+        } else { console.log("got ur move back"); }
+        pushToGame(data);
+    }
 }
 
+function connect (id) {
+    connection = peer.connect(id);
+    connection.on('data', receiveData(connection));
+}
 
+connect(otherId);
+connection.on('close', function() {
+    connect(otherId);
+});
+
+peer.on('connection', function (conn) {
+    console.log('received other dude\'s connection');
+    conn.on('data', receiveData(conn));
+})
