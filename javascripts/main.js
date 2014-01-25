@@ -1,6 +1,6 @@
 
 var checker = require('./lib/xiangcheck.js');
-var info = require('./initialize.js');
+var info = require('./lib/initialize.js');
 
 var playerColor = info.color;
 var id = info.id;
