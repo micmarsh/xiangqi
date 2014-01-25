@@ -1,7 +1,7 @@
 module Xiangqi where
 import Constants (allLetters, allColumns)
 import Board (makeBoard)
---import Sidebar (sidebar)
+import Sidebar (makeSideBar)
 import GameState (makeMoves, makeGame)
 import Window
 
@@ -27,7 +27,7 @@ rlift functions c = functions ~ (constant c)
 
 boardCanvas = makeBoard gameState color
 
-sidebar = constant <| asText "wooo"
+sidebar = makeSideBar gameState color
 
 toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
 

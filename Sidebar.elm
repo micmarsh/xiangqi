@@ -1,7 +1,7 @@
 module Sidebar where
 
-import GameState (gameState, playerColor)
-import Model (Red, Black, Piece, Color)
+--import GameState (gameState, playerColor)
+import Model (Red, Black, Piece, Color, playerADT)
 import Constants (sideBarWidth, squareSize)
 import Board (pieceImage)
 import Monad as M
@@ -13,14 +13,12 @@ spacerw = spacer sideBarWidth
 squareSpacer = spacerw sideBarWidth
 rectSpacer = spacerw squareSize
 
-translate player color =
-    if color == player then "Your"
+whoseTurn : Color -> Color -> String
+whoseTurn player turn =
+    if turn == player then "Your"
     else case player of
         Red -> "Red's"
         Black -> "Black's"
-
-whoseTurn : Maybe Color -> Color -> Maybe String
-whoseTurn option player = M.map (translate player) option
 
 applyColor : String -> Text
 applyColor string =
@@ -30,22 +28,13 @@ applyColor string =
         "Black's" -> color black text
         _ -> color darkGrey text
 
-turnText = lift (M.map applyColor) <| lift2 whoseTurn playerColor (lift .turn gameState)
-
-turnMessage : Maybe Text -> Element
-turnMessage nameOption =
-    case nameOption of
-        Nothing -> rectSpacer
-        Just name ->
-            let ending = color darkGrey <| toText " Turn"
-                phrase = [name, ending]
-                asElts = map text phrase
-            in
-                flow right asElts
-
-turnViews = lift turnMessage turnText
-
-selectedPiece = lift .selected gameState
+turnMessage : Text -> Element
+turnMessage name =
+    let ending = color darkGrey <| toText " Turn"
+        phrase = [name, ending]
+        asElts = map text phrase
+    in
+        flow right asElts
 
 makePieceView : Maybe Piece -> Element
 makePieceView option =
@@ -68,8 +57,6 @@ makePieceView option =
             --]
             -- TODO groovy lulu image in some hot and composable way. renaming will probs be involved
 
-pieceViews : Signal Element
-pieceViews = lift makePieceView selectedPiece
 
 putTogether turn piece =
     flow down [
@@ -79,5 +66,11 @@ putTogether turn piece =
     ]
 
 
-unsizedSidebar = lift2 putTogether turnViews pieceViews
-sidebar = lift (width sideBarWidth) unsizedSidebar
+makeSideBar gameState color =
+    let playerColor = lift playerADT color
+        turnText =  lift applyColor <| lift2 whoseTurn playerColor (lift .turn gameState)
+        turnViews = lift turnMessage turnText
+        selectedPiece = lift .selected gameState
+        pieceViews = lift makePieceView selectedPiece
+        unsizedSidebar = lift2 putTogether turnViews pieceViews
+    in lift (width sideBarWidth) unsizedSidebar
