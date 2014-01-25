@@ -1,8 +1,9 @@
 module Xiangqi where
 import Constants (allLetters, allColumns)
+import GameState (makeMoves, makeGame)
+import Parser (piece2List)
 import Board (makeBoard)
 import Sidebar (makeSideBar)
-import GameState (makeMoves, makeGame)
 import Window
 
 port color : Signal String
@@ -17,6 +18,10 @@ port outMoves : Signal {from : String, to : String}
 port outMoves = makeMoves inputs
 
 gameState = makeGame inputs
+
+pieces2List = map piece2List
+port pieces : Signal [[String]]
+port pieces = lift (pieces2List . .pieces) gameState
 
 
 centeredContainer : (Signal  (Position -> Element -> Element))
