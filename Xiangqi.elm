@@ -5,22 +5,18 @@ import Constants (allLetters, allColumns)
 import GameState (makeMoves, makeGame)
 import Window
 
-port hash : Signal String
 port color : Signal String
-port history : Signal {from : String, to : String}
 port confirmations : Signal {legal : Bool, move : {from : String, to : String}}
 
 inputs = {
-        hash = hash,
         color = color,
-        history = history,
         confirmations = confirmations
     }
 
 port moves : Signal {from : String, to : String}
 port moves = makeMoves inputs
 
---gameState = makeGame {inputs | moves = moves}
+gameState = makeGame inputs
 
 
 --centeredContainer : (Signal  (Position -> Element -> Element))
@@ -32,4 +28,4 @@ port moves = makeMoves inputs
 --toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
 
 --inMiddle = rlift centeredContainer middle
-main = lift asText moves--inMiddle ~ toDisplay
+main = lift asText gameState--inMiddle ~ toDisplay

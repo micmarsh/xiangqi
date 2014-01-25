@@ -1,4 +1,4 @@
-module Input (redBoardPosition, blackBoardPosition, urlHash, urlHost, incomingMessages) where
+module Input (redBoardPosition, blackBoardPosition) where
 import Constants (boardWidth, boardHeight, squareSize, num2Char, sideBarWidth)
 import Model (Black, Red)
 import Mouse

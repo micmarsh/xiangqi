@@ -14,9 +14,7 @@ encodeMove (from, to) =
         toStr = pos2String to
     in "{\"type\":\"move\",\"from\":\"" ++ fromStr ++ "\",\"to\":\"" ++ toStr ++ "\"}"
 
-decodeMove : String -> Maybe (Move, Metadata)
-decodeMove str =
-    map (\j -> (object2Move j, decodeMetadata j)) <| fromString str
+decodeMove = object2Move
 
 decodeMetadata : JsonValue -> Metadata
 decodeMetadata json =
@@ -24,11 +22,8 @@ decodeMetadata json =
         {gameId, player} = toRecord jsObj
     in {gameId = gameId, player = player}
 
-object2Move : JsonValue -> Move
-object2Move json =
-    let  jsObj = toJSObject json
-         {message} = toRecord jsObj
-         {from, to} = message
+object2Move message =
+    let  {from, to} = message
          start = string2Pos from
          end = string2Pos to
      in (start, end)

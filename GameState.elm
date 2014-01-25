@@ -1,11 +1,10 @@
 module GameState where
 import Model (Color, Red, Black, Position, Piece, allPieces, findPiece, State, Move)
 import Moving (makeMove)
-import WebSocket (connect)
 import Monad (map)
 import Http (Success, Waiting, Failure, sendGet)
 import JavaScript as J
-import Parser (pos2String)
+import Parser (pos2String, decodeMove)
 import Input
 import Mouse
 import String
@@ -38,6 +37,7 @@ choosePos player redPos blackPos =
 updateMove : Position -> Move -> Move
 updateMove position (from, to) = (to, position)
 initialMove = (('h',11), ('h',11))
+initialConfirmation = {legal = False, move = encodeMove initialMove}
 
 stail : String -> String
 stail = String.fromList . tail . String.toList
@@ -45,10 +45,13 @@ stail = String.fromList . tail . String.toList
 encodeMove (from, to) =
     {from = pos2String from, to = pos2String to}
 
-makeMoves {color} =
+makeClicks color =
     let playerColor = lift playerADT color
         mousePosition = lift3 choosePos playerColor Input.redBoardPosition Input.blackBoardPosition
-        clickPosition = sampleOn Mouse.clicks mousePosition
+    in sampleOn Mouse.clicks mousePosition
+
+makeMoves {color} =
+    let clickPosition = makeClicks color
         boardMoves = foldp updateMove initialMove clickPosition
     in lift encodeMove boardMoves
 
@@ -58,6 +61,31 @@ colorString player =
         Just Black -> "black"
         Just Red -> "red"
         Nothing -> "none"
+
+selectPiece state clickPos = { state |
+    selected <- if state.moved then Nothing
+                else findPiece state.pieces clickPos
+    }
+
+handleLegalMove  {move, legal} state =
+  let {turn, pieces} = state
+      (from, to) = move
+      mightMove = findPiece pieces from
+    in if not legal then { state | moved <- False}
+        else {turn = toggleTurn turn,
+              pieces = makeMove mightMove pieces to,
+              selected = Nothing,
+              moved = True}
+
+convertMoveRecord confirm = {confirm |
+        move <- decodeMove confirm.move
+    }
+
+makeGame {color, confirmations} =
+    let moves = lift convertMoveRecord confirmations
+        onlyMoves = foldp handleLegalMove initialState moves
+        clickPosition = makeClicks color
+    in lift2 selectPiece onlyMoves clickPosition
 
 --playerString = lift colorString playerColor
 --movesToCheck = lift3 serverMoveMessage gameId playerString <| lift Parser.encodeMove moves
@@ -70,36 +98,8 @@ colorString player =
 --        Nothing -> False
 --        (Just (Piece t p color)) -> color == playerADT player
 
---toggleTurn turn = case turn of
---    Red -> Black
---    Black -> Red
+toggleTurn turn = case turn of
+    Red -> Black
+    Black -> Red
 
 --selectPiece : State -> Position -> State
---selectPiece state clickPos = { state |
---        selected <- if state.moved then Nothing
---                    else findPiece state.pieces clickPos
---    }
-
---handleLegalMove : State -> (Move, Parser.Metadata) -> State
---handleLegalMove state (move, mData) =
---  let {turn, pieces} = state
---      (from, to) = move
---      mightMove = findPiece pieces from
---      moved = isLegal mightMove mData
---    in if not moved then { state | moved <- False}
---        else {turn = toggleTurn turn,
---              pieces = makeMove mightMove pieces to,
---              selected = Nothing,
---              moved = True}
-
---update : Maybe (Move, Parser.Metadata) -> State -> State
---update moveOption state =
---    case moveOption of
---        Nothing -> state
---        Just move -> handleLegalMove state move
-
---onlyMoves : Signal State
---onlyMoves = foldp update initialState allMoves
-
-gameState : Signal State
-gameState = (constant initialState)--lift2 selectPiece onlyMoves clickPosition
