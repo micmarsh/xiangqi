@@ -28,9 +28,9 @@
 
     var app = Elm.fullscreen(Elm.Xiangqi);
 
-    app.send('host', location.host);
-    w.onhashchange = function (){ app.send('hash', location.hash); }
+    w.onhashchange = function (){ app.ports.hash.send(location.hash); }
     w.onhashchange()
+
 })(window);
 
 </script>

@@ -4,6 +4,7 @@ import Moving (makeMove)
 import WebSocket (connect)
 import Monad (map)
 import Http (Success, Waiting, Failure, sendGet)
+import JavaScript as J
 import Parser
 import Input
 import Mouse
@@ -17,22 +18,15 @@ playerADT color =
         "black" -> Black
         _ -> Red
 
--- TODO this shit can totally be part of a more general "url" signal that
--- you prtovide, that we can derive ID from as well, once u get a sflatten type thing
-heroku = False
-serverName = if heroku then "glacial-island-4986.herokuapp.com" else "localhost:8008"
-server = "://"++serverName++"/"
-http = "http" ++ if heroku then "s" else ""
+--playerRequest = sendGet (lift3 (\http server id -> http ++ server ++ id) http server gameId)
 
-playerRequest = sendGet (lift (\id -> http ++ server ++ id) gameId)
+--parseResponse response =
+--    case response of
+--        Success color -> Just color
+--        Waiting -> Nothing
+--        Failure code message -> Nothing
 
-parseResponse response =
-    case response of
-        Success color -> Just color
-        Waiting -> Nothing
-        Failure code message -> Nothing
-
-playerColor = lift ((map playerADT) . parseResponse) playerRequest
+playerColor = constant (Just Red) --lift ((map playerADT) . parseResponse) playerRequest
 
 initialState : State
 initialState = {turn = Red, pieces = allPieces, selected = Nothing, moved = False}
@@ -69,9 +63,20 @@ colorString player =
         Just Red -> "red"
         Nothing -> "none"
 
-movesToCheck = lift3 serverMoveMessage gameId (lift colorString playerColor) <| lift Parser.encodeMove moves
-socketConnection = connect ("ws" ++ server ++ "move") movesToCheck
-allMoves = lift Parser.decodeMove socketConnection
+playerString = lift colorString playerColor
+movesToCheck = lift3 serverMoveMessage gameId playerString <| lift Parser.encodeMove moves
+--socketConnection = connect ("ws" ++ server ++ "move") movesToCheck
+
+--makeSocketUrl server id color = "ws" ++ server ++ "move/" ++ id ++ "/" ++ color
+--socketUrl = lift3 makeSocketUrl server gameId playerString
+--outGoingMessages = lift J.fromString <| lift2 (\url message -> url ++ "|" ++ message) socketUrl movesToCheck
+
+--foreign export jsevent "toWebsocket"
+--    outGoingMessages : Signal J.JSString
+
+--socketConnection = Input.incomingMessages
+
+allMoves = lift Parser.decodeMove (constant "")
 
 isLegal : Maybe Piece -> Parser.Metadata -> Bool
 isLegal piece {player} =
