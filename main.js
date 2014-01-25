@@ -22,7 +22,12 @@ var app = Elm.fullscreen(Elm.Xiangqi, {
     inMoves: {legal: false, move: sampleShit}
 });
 
-app.ports.pieces.subscribe(function (pieces) {
-    console.log(pieces);
-    checker.setState(pieces);
+app.ports.state.subscribe(function (state) {
+    var pieces = state.pieces;
+    var turn = state.turn;
+    checker.setState(pieces, turn);
+});
+app.ports.outMoves.subscribe(function (move) {
+    var legal = checker.isLegal(move);
+    app.ports.inMoves.send({legal: legal, move: move});
 });
