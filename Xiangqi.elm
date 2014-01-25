@@ -6,15 +6,15 @@ import GameState (makeMoves, makeGame)
 import Window
 
 port color : Signal String
-port confirmations : Signal {legal : Bool, move : {from : String, to : String}}
+port inMoves : Signal {legal : Bool, {from : String, to : String}}
 
 inputs = {
         color = color,
-        confirmations = confirmations
+        moves = inMoves
     }
 
-port moves : Signal {from : String, to : String}
-port moves = makeMoves inputs
+port outMoves : Signal {from : String, to : String}
+port outMoves = makeMoves inputs
 
 gameState = makeGame inputs
 
@@ -28,4 +28,4 @@ gameState = makeGame inputs
 --toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
 
 --inMiddle = rlift centeredContainer middle
-main = lift asText gameState--inMiddle ~ toDisplay
+main = lift asText <| lift2 (,) moves gameState

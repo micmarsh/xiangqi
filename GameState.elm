@@ -55,13 +55,6 @@ makeMoves {color} =
         boardMoves = foldp updateMove initialMove clickPosition
     in lift encodeMove boardMoves
 
-colorString : Maybe Color -> String
-colorString player =
-    case player of
-        Just Black -> "black"
-        Just Red -> "red"
-        Nothing -> "none"
-
 selectPiece state clickPos = { state |
     selected <- if state.moved then Nothing
                 else findPiece state.pieces clickPos
@@ -81,25 +74,13 @@ convertMoveRecord confirm = {confirm |
         move <- decodeMove confirm.move
     }
 
+toggleTurn turn = case turn of
+    Red -> Black
+    Black -> Red
+
 makeGame {color, confirmations} =
     let moves = lift convertMoveRecord confirmations
         onlyMoves = foldp handleLegalMove initialState moves
         clickPosition = makeClicks color
     in lift2 selectPiece onlyMoves clickPosition
 
---playerString = lift colorString playerColor
---movesToCheck = lift3 serverMoveMessage gameId playerString <| lift Parser.encodeMove moves
-
---allMoves = lift Parser.decodeMove (constant "")
-
---isLegal : Maybe Piece -> Parser.Metadata -> Bool
---isLegal piece {player} =
---    case piece of
---        Nothing -> False
---        (Just (Piece t p color)) -> color == playerADT player
-
-toggleTurn turn = case turn of
-    Red -> Black
-    Black -> Red
-
---selectPiece : State -> Position -> State

@@ -24,15 +24,17 @@
     var playerColor = "black";
 
     if (!isGame(currentId)) {
-        location.hash = '#' + newId();
+        location.hash = currentId = '#' + newId();
         playerColor = "red";
     }
 
     var sampleShit = {from: '0,0', to: '2,3'};
     var app = Elm.fullscreen(Elm.Xiangqi, {
         color: playerColor,
-        confirmations: {legal: true, move: sampleShit}
+        inMoves: {legal: false, sampleShit}
     });
+
+
 
 })(window);
 
