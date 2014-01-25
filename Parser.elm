@@ -8,21 +8,7 @@ import Monad (map)
 
 type Metadata = {gameId : String, player: String}
 
-encodeMove : Move -> String
-encodeMove (from, to) =
-    let fromStr = pos2String from
-        toStr = pos2String to
-    in "{\"type\":\"move\",\"from\":\"" ++ fromStr ++ "\",\"to\":\"" ++ toStr ++ "\"}"
-
-decodeMove = object2Move
-
-decodeMetadata : JsonValue -> Metadata
-decodeMetadata json =
-    let jsObj = toJSObject json
-        {gameId, player} = toRecord jsObj
-    in {gameId = gameId, player = player}
-
-object2Move message =
+decodeMove message =
     let  {from, to} = message
          start = string2Pos from
          end = string2Pos to
@@ -37,7 +23,7 @@ pos2String pair =
 chars2Pos : [Char] -> Position
 chars2Pos chars =
     let char = head chars
-        numStr = (tail . tail) chars |> fromList
+        numStr = drop 2 chars |> fromList
         number = case (toInt numStr) of
                     Nothing -> -1
                     Just num -> num
@@ -60,3 +46,25 @@ int2Str int =
         9 -> "9"
         10 -> "10"
         _ -> "11"
+
+piece2List : Piece -> [String]
+piece2List (Piece kind position player) =
+    let strType = type2String kind
+        strPos = pos2String position
+        strColor = encodeColor player
+    in [strType, strPos, strColor]
+
+type2String adt =
+    case adt of
+        Soldier -> "Soldier"
+        Advisor -> "Advisor"
+        Elephant -> "Elephant"
+        Horse -> "Horse"
+        Cannon -> "Cannon"
+        Chariot -> "Chariot"
+        King -> "King"
+
+encodeColor color =
+    case color of
+        Black -> "Black"
+        Red -> "Red"

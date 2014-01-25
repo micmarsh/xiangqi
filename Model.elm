@@ -1,7 +1,7 @@
 module Model where
 import Constants (allLetters, soldierLetters)
 
-data Type = Soldier Bool |
+data Type = Soldier |
             Advisor |
             Elephant |
             Horse |
@@ -16,7 +16,7 @@ data Piece = Piece Type Position Color
 
 type State = {turn : Color, pieces : [Piece], selected: Maybe Piece, moved: Bool}
 
-soldier char = Piece (Soldier False) (char, 4) Red
+soldier char = Piece Soldier (char, 4) Red
 soldiers = map soldier soldierLetters
 cannons = map (\c -> Piece Cannon (c, 3) Red) ['b', 'h']
 
