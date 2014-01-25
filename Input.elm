@@ -1,7 +1,6 @@
 module Input (redBoardPosition, blackBoardPosition, urlHash, urlHost, incomingMessages) where
 import Constants (boardWidth, boardHeight, squareSize, num2Char, sideBarWidth)
 import Model (Black, Red)
-import Xiangqi (hash)
 import Mouse
 import Window
 import JavaScript (fromString, toString, JSString)
@@ -32,5 +31,3 @@ toBoardPosition player (x, y) = (toBoardColumn player x, toBoardRow player y)
 
 redBoardPosition = lift (toBoardPosition Red) boardPixels
 blackBoardPosition = lift (toBoardPosition Black) boardPixels
-
-urlHash = hash

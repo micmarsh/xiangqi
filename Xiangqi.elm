@@ -1,16 +1,14 @@
 module Xiangqi where
 import Constants (allLetters, allColumns)
-import Board (boardCanvas)
-import Sidebar (sidebar)
+--import Board (boardCanvas)
+--import Sidebar (sidebar)
 import GameState (makeMoves, makeGame)
 import Window
 
-type Move = {from : String, to : String}
-
 port hash : Signal String
 port color : Signal String
-port history : Signal Move
-port confirmations = Signal {legal : Bool, move : Move}
+port history : Signal {from : String, to : String}
+port confirmations : Signal {legal : Bool, move : {from : String, to : String}}
 
 inputs = {
         hash = hash,
@@ -19,10 +17,10 @@ inputs = {
         confirmations = confirmations
     }
 
-port moves : Signal Move
-moves = makeMoves inputs
+port moves : Signal {from : String, to : String}
+port moves = makeMoves inputs
 
-gameState = makeGame {inputs | moves = moves}
+--gameState = makeGame {inputs | moves = moves}
 
 
 --centeredContainer : (Signal  (Position -> Element -> Element))
@@ -34,4 +32,4 @@ gameState = makeGame {inputs | moves = moves}
 --toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
 
 --inMiddle = rlift centeredContainer middle
-main =  asText gameState --inMiddle ~ toDisplay
+main = lift asText moves--inMiddle ~ toDisplay
