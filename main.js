@@ -1,5 +1,5 @@
 
-var Checker = require('./lib/xiangcheck.js');
+var checker = require('./lib/xiangcheck.js');
 
 function isGame(id) {
     return typeof id === 'string' && id.length === 5;
@@ -24,4 +24,5 @@ var app = Elm.fullscreen(Elm.Xiangqi, {
 
 app.ports.pieces.subscribe(function (pieces) {
     console.log(pieces);
+    checker.setState(pieces);
 });
