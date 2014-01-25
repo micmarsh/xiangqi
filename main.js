@@ -20,10 +20,11 @@ for (var i in history) {
 app.ports.state.subscribe(function (state) {
     var pieces = state.pieces;
     var turn = state.turn;
+    console.log(turn);
     checker.setState(pieces, turn);
 });
 app.ports.outMoves.subscribe(function (move) {
-    var legal = checker.isLegal(move);
+    var legal = checker.isLegal(move, playerColor);
     console.log(legal + ' ' + JSON.stringify(move));
     app.ports.inMoves.send({legal: legal, move: move});
 });
