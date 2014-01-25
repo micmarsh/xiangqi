@@ -30,13 +30,10 @@ var otherId = 'xiangqi-'+otherPlayer+id;
 var peer = new Peer(peerId, {key: '51am0fffupb0ggb9'});
 
 var connection = peer.connect(otherId);
-connection.on('open', function(){
-    connection.opened = true;
-});
 
 app.ports.outMoves.subscribe(function (move) {
     var legal = checker.isLegal(move, playerColor);
-    if (legal && connection.opened) {
+    if (legal && connection.open) {
         connection.send({
             move: move,
             color: playerColor
@@ -46,24 +43,34 @@ app.ports.outMoves.subscribe(function (move) {
     }
 });
 
+connection.on('data', receiveData);
+
 peer.on('connection', function (conn) {
-    conn.on('data', function (data) {
-        var move = data.move;
-        var color = data.color;
-        var legal = data.legal || false;
-        if(color === playerColor) {
-            console.log("u got ur move back");
-            app.ports.inMoves.send({legal: legal, move: move});
-        } else {
-            console.log("checking someone else's move");
-            legal = checker.isLegal(move, color);
-            conn.send({
-                move: move,
-                color: color,
-                legal: legal
-            });
-        }
-    });
+    console.log('received other dude\'s connection');
+    conn.on('data', receiveData);
 })
+
+function pushToGame (data) {
+    delete data.color;
+    app.ports.inMoves.send(data);
+}
+function receiveData (data) {
+    var move = data.move;
+    var color = data.color;
+    var legal = data.legal || false;
+    if(color !== playerColor) {
+        console.log("checking someone else's move");
+        legal = checker.isLegal(move, color);
+        conn.send({
+            move: move,
+            color: color,
+            legal: legal
+        });
+        if(legal) {
+            checker.setTurn(playerColor);
+        }
+    } else { console.log("got ur move back"); }
+    pushToGame(data);
+}
 
 
