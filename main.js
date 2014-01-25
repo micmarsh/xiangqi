@@ -36,11 +36,10 @@ connection.on('open', function(){
 
 app.ports.outMoves.subscribe(function (move) {
     var legal = checker.isLegal(move, playerColor);
-    console.log(legal + ' ' + JSON.stringify(move));
     if (legal && connection.opened) {
         connection.send({
             move: move,
-            color: otherPlayer
+            color: playerColor
         });
     } else {
         app.ports.inMoves.send({legal: false, move: move});
@@ -48,15 +47,15 @@ app.ports.outMoves.subscribe(function (move) {
 });
 
 peer.on('connection', function (conn) {
-    console.log("yooooo connection");
     conn.on('data', function (data) {
-        console.log('yooooo data' + JSON.stringify(data));
         var move = data.move;
         var color = data.color;
-        var legal = data.legal;
+        var legal = data.legal || false;
         if(color === playerColor) {
+            console.log("u got ur move back");
             app.ports.inMoves.send({legal: legal, move: move});
         } else {
+            console.log("checking someone else's move");
             legal = checker.isLegal(move, color);
             conn.send({
                 move: move,
