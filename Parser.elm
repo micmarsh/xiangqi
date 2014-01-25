@@ -4,6 +4,7 @@ import Model (Color, Black, Red, Piece, State, Position, Move,
 import String (cons, toInt, toList, fromList)
 import Json (fromString, toJSObject, JsonValue)
 import JavaScript.Experimental (toRecord)
+import Constants (char2Num)
 import Monad (map)
 
 type Metadata = {gameId : String, player: String}
@@ -17,8 +18,9 @@ decodeMove message =
 pos2String : Position -> String
 pos2String pair =
     let (col, int) = pair
-        row = int2Str int
-    in cons col <| cons ',' row
+        row = int2Str (int - 1)
+        intCol = (int2Str . char2Num) col
+    in (++) intCol <| cons ',' row
 
 chars2Pos : [Char] -> Position
 chars2Pos chars =
@@ -35,6 +37,7 @@ string2Pos = chars2Pos . toList
 int2Str : Int -> String
 int2Str int =
     case int of
+        0 -> "0"
         1 -> "1"
         2 -> "2"
         3 -> "3"
@@ -66,5 +69,5 @@ type2String adt =
 
 encodeColor color =
     case color of
-        Black -> "Black"
-        Red -> "Red"
+        Black -> "black"
+        Red -> "red"

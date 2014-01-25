@@ -23,7 +23,6 @@ pieces2List = map piece2List
 port pieces : Signal [[String]]
 port pieces = lift (pieces2List . .pieces) gameState
 
-
 centeredContainer : (Signal  (Position -> Element -> Element))
 centeredContainer = lift2 container Window.width Window.height
 
