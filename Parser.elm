@@ -31,10 +31,10 @@ chars2Pos : [Char] -> Position
 chars2Pos chars =
     let colStr = take 1 chars |> fromList
         col = unpack <| toInt colStr
+        char = num2Char col
         numStr = drop 2 chars |> fromList
         number = unpack <| toInt numStr
-        char = num2Char col
-    in (char, number)
+    in (char, number + 1)
 
 string2Pos : String -> Position
 string2Pos = chars2Pos . toList

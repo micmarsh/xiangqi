@@ -24,5 +24,6 @@ app.ports.state.subscribe(function (state) {
 });
 app.ports.outMoves.subscribe(function (move) {
     var legal = checker.isLegal(move);
+    console.log(legal + ' ' + JSON.stringify(move));
     app.ports.inMoves.send({legal: legal, move: move});
 });
