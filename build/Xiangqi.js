@@ -42,6 +42,11 @@ Elm.Xiangqi.make = function (_elm)
                                                 Window.height);
                      var inMiddle = A2(rlift,centeredContainer,Graphics.Element.middle);
                      var pieces2List = List.map(Parser.piece2List);
+                     var connected = Native.Ports.portIn("connected",
+                                                         Native.Ports.incomingSignal(function (v)
+                                                                                     {
+                                                                                       return typeof v === "boolean" ? _J.toBool(v) : _E.raise("invalid input, expecting JSBoolean but got " + v);
+                                                                                     }));
                      var inMoves = Native.Ports.portIn("inMoves",
                                                        Native.Ports.incomingSignal(function (v)
                                                                                    {
@@ -97,7 +102,7 @@ Elm.Xiangqi.make = function (_elm)
                                                          pieces,
                                                          turn));
                      var boardCanvas = A2(Board.makeBoard,gameState,color);
-                     var sidebar = A2(Sidebar.makeSideBar,gameState,color);
+                     var sidebar = A3(Sidebar.makeSideBar,gameState,color,connected);
                      var toDisplay = A3(Signal.lift2,
                                         F2(function (board,sidebar)
                                            {
@@ -189,7 +194,7 @@ Elm.Sidebar.make = function (_elm)
                                                      case
                                                      "Nothing" :
                                                        return squareSpacer;}
-                                                    _E.Case($moduleName,"between lines 41 and 58");
+                                                    _E.Case($moduleName,"between lines 41 and 50");
                                                   }();
                                          };
                      var putTogether = F2(function (turn,piece)
@@ -218,6 +223,14 @@ Elm.Sidebar.make = function (_elm)
                                                         }();
                                                }();
                                       };
+                     var disconnected = function ($)
+                                        {
+                                          return Text.text(applyColor($));
+                                        }("Waiting for other player...");
+                     var makeTitle = F2(function (turnView,connected)
+                                        {
+                                          return connected ? turnView : disconnected;
+                                        });
                      var turnMessage = function (name)
                                        {
                                          return function ()
@@ -230,7 +243,26 @@ Elm.Sidebar.make = function (_elm)
                                                             asElts);
                                                 }();
                                        };
-                     var makeSideBar = F2(function (gameState,color)
+                     var makeTurnView = F2(function (gameState,color)
+                                           {
+                                             return function ()
+                                                    {
+                                                      var playerColor = A2(Signal.lift,
+                                                                           Model.playerADT,
+                                                                           color);
+                                                      var turnText = Signal.lift(applyColor)(A3(Signal.lift2,
+                                                                                                whoseTurn,
+                                                                                                playerColor,
+                                                                                                A2(Signal.lift,
+                                                                                                   function (_)
+                                                                                                   {
+                                                                                                     return _.turn;
+                                                                                                   },
+                                                                                                   gameState)));
+                                                      return A2(Signal.lift,turnMessage,turnText);
+                                                    }();
+                                           });
+                     var makeSideBar = F3(function (gameState,color,connected)
                                           {
                                             return function ()
                                                    {
@@ -243,31 +275,23 @@ Elm.Sidebar.make = function (_elm)
                                                      var pieceViews = A2(Signal.lift,
                                                                          makePieceView,
                                                                          selectedPiece);
-                                                     var playerColor = A2(Signal.lift,
-                                                                          Model.playerADT,
-                                                                          color);
-                                                     var turnText = Signal.lift(applyColor)(A3(Signal.lift2,
-                                                                                               whoseTurn,
-                                                                                               playerColor,
-                                                                                               A2(Signal.lift,
-                                                                                                  function (_)
-                                                                                                  {
-                                                                                                    return _.turn;
-                                                                                                  },
-                                                                                                  gameState)));
-                                                     var turnViews = A2(Signal.lift,
-                                                                        turnMessage,
-                                                                        turnText);
+                                                     var turnViews = A2(makeTurnView,
+                                                                        gameState,
+                                                                        color);
+                                                     var titleViews = A3(Signal.lift2,
+                                                                         makeTitle,
+                                                                         turnViews,
+                                                                         connected);
                                                      var unsizedSidebar = A3(Signal.lift2,
                                                                              putTogether,
-                                                                             turnViews,
+                                                                             titleViews,
                                                                              pieceViews);
                                                      return A2(Signal.lift,
                                                                Graphics.Element.width(Constants.sideBarWidth),
                                                                unsizedSidebar);
                                                    }();
                                           });
-                     _elm.Sidebar.values = {_op: _op, color: color, darkGrey: darkGrey, spacerw: spacerw, squareSpacer: squareSpacer, rectSpacer: rectSpacer, whoseTurn: whoseTurn, applyColor: applyColor, turnMessage: turnMessage, makePieceView: makePieceView, putTogether: putTogether, makeSideBar: makeSideBar};
+                     _elm.Sidebar.values = {_op: _op, color: color, darkGrey: darkGrey, spacerw: spacerw, squareSpacer: squareSpacer, rectSpacer: rectSpacer, whoseTurn: whoseTurn, applyColor: applyColor, turnMessage: turnMessage, makePieceView: makePieceView, putTogether: putTogether, makeTurnView: makeTurnView, disconnected: disconnected, makeTitle: makeTitle, makeSideBar: makeSideBar};
                      return _elm.Sidebar.values;
                    };Elm.Board = Elm.Board || {};
 Elm.Board.make = function (_elm)
@@ -373,29 +397,29 @@ Elm.Board.make = function (_elm)
                                                             fullPath);
                                                 }();
                                        });
-                   var initialMove = function (_v3)
+                   var initialMove = function (_v2)
                                      {
                                        return function ()
                                               {
-                                                switch (_v3.ctor)
+                                                switch (_v2.ctor)
                                                 {case
                                                  "_Tuple2" :
-                                                   return {ctor: "_Tuple2", _0: _v3._0 - Constants.centerWidth, _1: _v3._1 - Constants.centerHeight};}
+                                                   return {ctor: "_Tuple2", _0: _v2._0 - Constants.centerWidth, _1: _v2._1 - Constants.centerHeight};}
                                                 _E.Case($moduleName,"on line 25, column 28 to 65");
                                               }();
                                      };
-                   var translate2Pixels = F2(function (_v7,player)
+                   var translate2Pixels = F2(function (_v6,player)
                                              {
                                                return function ()
                                                       {
-                                                        switch (_v7.ctor)
+                                                        switch (_v6.ctor)
                                                         {case
                                                          "_Tuple2" :
                                                            return function ()
                                                                   {
-                                                                    var horIndex = Constants.char2Num(_v7._0);
+                                                                    var horIndex = Constants.char2Num(_v6._0);
                                                                     var defaultWidth = horIndex * Constants.squareSize;
-                                                                    var vertIndex = _v7._1 - 1;
+                                                                    var vertIndex = _v6._1 - 1;
                                                                     var defaultHeight = vertIndex * Constants.squareSize;
                                                                     return function ()
                                                                            {
@@ -414,37 +438,37 @@ Elm.Board.make = function (_elm)
                                                                 "between lines 17 and 23");
                                                       }();
                                              });
-                   var tmap = F2(function (fn,_v12)
+                   var tmap = F2(function (fn,_v11)
                                  {
                                    return function ()
                                           {
-                                            switch (_v12.ctor)
+                                            switch (_v11.ctor)
                                             {case
                                              "_Tuple2" :
-                                               return {ctor: "_Tuple2", _0: fn(_v12._0), _1: fn(_v12._1)};}
+                                               return {ctor: "_Tuple2", _0: fn(_v11._0), _1: fn(_v11._1)};}
                                             _E.Case($moduleName,"on line 12, column 6 to 20");
                                           }();
                                  });
                    var toFloats = tmap(Basics.toFloat);
-                   var makePiece = F2(function (_v16,you)
+                   var makePiece = F2(function (_v15,you)
                                       {
                                         return function ()
                                                {
-                                                 switch (_v16.ctor)
+                                                 switch (_v15.ctor)
                                                  {case
                                                   "Piece" :
                                                     return function ()
                                                            {
                                                              var numPosition = A2(translate2Pixels,
-                                                                                  _v16._1,
+                                                                                  _v15._1,
                                                                                   you);
                                                              var moveTo = function ($)
                                                                           {
                                                                             return toFloats(initialMove($));
                                                                           }(numPosition);
                                                              return Graphics.Collage.move(moveTo)(Graphics.Collage.toForm(A2(pieceImage,
-                                                                                                                             _v16._0,
-                                                                                                                             _v16._2)));
+                                                                                                                             _v15._0,
+                                                                                                                             _v15._2)));
                                                            }();}
                                                  _E.Case($moduleName,"between lines 49 and 53");
                                                }();
