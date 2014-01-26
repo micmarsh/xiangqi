@@ -27,19 +27,20 @@ app.ports.state.subscribe(function (state) {
     checker.setState(pieces, turn);
 });
 
-var peerId = 'xiangqi-'+playerColor+id;
-var otherId = 'xiangqi-'+otherPlayer+id;
-var peer = new Peer(peerId, {key: '51am0fffupb0ggb9'});
-
-var connection;
+var connection = require('./connection').connect({
+    playerColor: playerColor,
+    otherPlayer: otherPlayer,
+    id: id,
+    app: app,
+    checker: checker
+})
 
 app.ports.outMoves.subscribe(function (move) {
     var legal = checker.isLegal(move, playerColor);
-    if(!connection.open){
-        console.log('wtf y u no open');
-        connect(otherId);
+    if(!connection.isOpen()){
+        connection.reconnect();
     };
-    if (legal && connection.open) {
+    if (legal && connection.isOpen()) {
         connection.send({
             move: move,
             color: playerColor
@@ -49,50 +50,4 @@ app.ports.outMoves.subscribe(function (move) {
     }
 });
 
-function pushToGame (data, history) {
-    delete data.color;
-    app.ports.inMoves.send(data);
-    if (data.legal) {
-        history.push(data.move);
-    }
-}
 
-function receiveData (conn) {
-    var history = require('./history');
-    return function (data) {
-        if(data.color !== playerColor) {
-            console.log("checking someone else's move");
-            data.legal = checker.isLegal(data.move, data.color);
-            conn.send(data);
-            if(data.legal) {
-                checker.setTurn(playerColor);
-            }
-        } else { console.log("got ur move back"); }
-        pushToGame(data, history);
-    }
-}
-
-var connected;
-function connect (id) {
-    connection = peer.connect(id);
-    connection.on('data', receiveData(connection));
-    connection.on('open', function(e) {
-        connected = true;
-    });
-    connection.on('close', function(e) {
-        connected = false;
-        connect(otherId);
-    });
-}
-
-connect(otherId);
-
-setInterval(function(){
-    connected = connection.open;
-    app.ports.connected.send(connected);
-},1000);
-
-peer.on('connection', function (conn) {
-    connected = true;
-    conn.on('data', receiveData(conn));
-})
