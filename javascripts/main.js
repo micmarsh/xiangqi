@@ -12,7 +12,8 @@ var app = Elm.fullscreen(Elm.Xiangqi, {
     inMoves: {
         legal: false,
         move: {from: '0,0', to: '0,0'}
-    }
+    },
+    connected: false
 });
 
 for (var i in history) {
@@ -71,23 +72,27 @@ function receiveData (conn) {
     }
 }
 
+var connected;
 function connect (id) {
     connection = peer.connect(id);
     connection.on('data', receiveData(connection));
     connection.on('open', function(e) {
-        console.log('woooooo u opened');
-        console.log(e);
+        connected = true;
     });
     connection.on('close', function(e) {
-        console.log('u closed');
+        connected = false;
         connect(otherId);
     });
 }
 
 connect(otherId);
 
+setInterval(function(){
+    connected = connection.open;
+    app.ports.connected.send(connected);
+},1000);
+
 peer.on('connection', function (conn) {
-    console.log('received other dude\'s connection');
+    connected = true;
     conn.on('data', receiveData(conn));
 })
-
