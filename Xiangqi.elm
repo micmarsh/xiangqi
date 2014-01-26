@@ -8,6 +8,7 @@ import Window
 
 port color : Signal String
 port inMoves : Signal {legal: Bool, move: {from: String, to: String}}
+port connected : Signal Bool
 
 inputs = {
         color = color,
@@ -34,7 +35,7 @@ rlift functions c = functions ~ (constant c)
 
 boardCanvas = makeBoard gameState color
 
-sidebar = makeSideBar gameState color
+sidebar = makeSideBar gameState color connected
 
 toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
 

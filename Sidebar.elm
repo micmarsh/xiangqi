@@ -48,15 +48,6 @@ makePieceView option =
                 rectSpacer,
                 biggerImage
             ]
-            --let textWidth = sideBarWidth - squareSize
-            --    textWrapper = container textWidth squareSize midLeft
-            --    textElt = text . (Text.color darkGrey) <| toText "Selected Piece"
-            --in flow right [
-            --    textWrapper textElt,
-            --    pieceImage kind color
-            --]
-            -- TODO groovy lulu image in some hot and composable way. renaming will probs be involved
-
 
 putTogether turn piece =
     flow down [
@@ -65,12 +56,22 @@ putTogether turn piece =
         piece
     ]
 
-
-makeSideBar gameState color =
+makeTurnView gameState color  =
     let playerColor = lift playerADT color
         turnText =  lift applyColor <| lift2 whoseTurn playerColor (lift .turn gameState)
-        turnViews = lift turnMessage turnText
+    in lift turnMessage turnText
+
+disconnected : Element
+disconnected = (text . applyColor) "Waiting for other player..."
+
+makeTitle : Element -> Bool -> Element
+makeTitle turnView connected =
+    if connected then turnView else disconnected
+
+makeSideBar gameState color connected =
+    let turnViews = makeTurnView gameState color
+        titleViews = lift2 makeTitle turnViews connected
         selectedPiece = lift .selected gameState
         pieceViews = lift makePieceView selectedPiece
-        unsizedSidebar = lift2 putTogether turnViews pieceViews
+        unsizedSidebar = lift2 putTogether titleViews pieceViews
     in lift (width sideBarWidth) unsizedSidebar
