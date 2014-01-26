@@ -1,4 +1,3 @@
-
 System.create 'master', (message) ->
     switch message.type
         when 'get-color'

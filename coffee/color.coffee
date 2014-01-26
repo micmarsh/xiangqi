@@ -1,4 +1,3 @@
-
 System.create 'color', (m, sender, self) ->
     switch m.type
         when 'get-color'

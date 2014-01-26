@@ -1,9 +1,7 @@
-
 System = do ->
     actors = { }
     create: (name, onReceive) ->
         actors[name] = actor = {
-            onReceive,
             send: (message, sender) ->
                 onReceive(message, sender, actor)
         }
@@ -13,5 +11,3 @@ System = do ->
         unless actor
             throw new Error "#{name} doesn't exist"
         return actor
-
-
