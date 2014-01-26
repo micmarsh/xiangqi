@@ -1,6 +1,6 @@
 
 var checker = require('./lib/xiangcheck.js');
-var info = require('./lib/initialize.js');
+var info = require('./initialize.js');
 
 var playerColor = info.color;
 var id = info.id;
@@ -44,12 +44,18 @@ app.ports.outMoves.subscribe(function (move) {
     }
 });
 
-function pushToGame (data) {
+function pushToGame (data, history) {
     console.log('adding data to game '+JSON.stringify(data));
     delete data.color;
     app.ports.inMoves.send(data);
+    if (data.legal) {
+        alert('push 2 history');
+        history.push(data.move);
+    }
 }
+
 function receiveData (conn) {
+    var history = require('./history');
     return function (data) {
         if(data.color !== playerColor) {
             console.log("checking someone else's move");
@@ -59,7 +65,7 @@ function receiveData (conn) {
                 checker.setTurn(playerColor);
             }
         } else { console.log("got ur move back"); }
-        pushToGame(data);
+        pushToGame(data, history);
     }
 }
 

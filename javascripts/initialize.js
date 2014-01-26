@@ -13,7 +13,7 @@ if (!isGame(currentId)) {
     playerColor = "red";
 }
 var STORAGE_KEY = 'xiangqi-' + currentId
-var saved = JSON.parse(localStorage[STORAGE_KEY] || "{}");
+var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 
 if (saved) {
     if (saved.color) {
@@ -29,7 +29,7 @@ saved = {
     history: history,
 }
 
-localStorage[STORAGE_KEY] = JSON.stringify(saved);
+localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
 
+saved.id = currentId;
 module.exports = saved;
-exports.id = currentId;
