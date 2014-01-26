@@ -1,6 +1,4 @@
 
-var Position = require('./position.js');
-
 var Position = require('./position');
 
 var Pieces = {};
@@ -12,8 +10,9 @@ Pieces.King = require('./general');
 Pieces.Horse = require('./horse');
 Pieces.Soldier = require('./soldier');
 
+var Start = require('./starting_position');
 var checker = {};
-var position;
+var position = new Start();
 var TYPE = 0;
 var POSITION = 1;
 var COLOR = 2;
