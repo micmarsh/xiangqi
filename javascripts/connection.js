@@ -10,6 +10,7 @@ function connect (args) {
     var peer = new Peer(peerId, {key: '51am0fffupb0ggb9'});
 
     var connection;
+    var cou
 
     function pushToGame (data, history) {
         delete data.color;
@@ -65,7 +66,7 @@ function connect (args) {
         send: function (data) {
             connection.send(data);
         },
-        reconnect: function(){
+        reconnect: function (){
             _connect(otherId);
         }
     };
