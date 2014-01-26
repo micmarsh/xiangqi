@@ -35,7 +35,7 @@ var connection;
 app.ports.outMoves.subscribe(function (move) {
     var legal = checker.isLegal(move, playerColor);
     if(!connection.open){
-        alert('wtf y u no open');
+        console.log('wtf y u no open');
         connect(otherId);
     };
     if (legal && connection.open) {
@@ -75,11 +75,11 @@ function connect (id) {
     connection = peer.connect(id);
     connection.on('data', receiveData(connection));
     connection.on('open', function(e) {
-        alert('woooooo u opened');
+        console.log('woooooo u opened');
         console.log(e);
     });
     connection.on('close', function(e) {
-        alert('u closed');
+        console.log('u closed');
         connect(otherId);
     });
 }
