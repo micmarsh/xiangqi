@@ -7,10 +7,12 @@ var id = info.id;
 var history = info.history;
 var otherPlayer = playerColor === "red" ? "black" : "red"
 
-var sampleShit = {from: '0,0', to: '2,3'};
 var app = Elm.fullscreen(Elm.Xiangqi, {
     color: playerColor,
-    inMoves: {legal: false, move: sampleShit}
+    inMoves: {
+        legal: false,
+        move: {from: '0,0', to: '0,0'}
+    }
 });
 
 for (var i in history) {
@@ -21,7 +23,6 @@ for (var i in history) {
 app.ports.state.subscribe(function (state) {
     var pieces = state.pieces;
     var turn = state.turn;
-    console.log(turn);
     checker.setState(pieces, turn);
 });
 
@@ -33,7 +34,10 @@ var connection;
 
 app.ports.outMoves.subscribe(function (move) {
     var legal = checker.isLegal(move, playerColor);
-    console.log(connection.open);
+    if(!connection.open){
+        alert('wtf y u no open');
+        connect(otherId);
+    };
     if (legal && connection.open) {
         connection.send({
             move: move,
@@ -45,11 +49,9 @@ app.ports.outMoves.subscribe(function (move) {
 });
 
 function pushToGame (data, history) {
-    console.log('adding data to game '+JSON.stringify(data));
     delete data.color;
     app.ports.inMoves.send(data);
     if (data.legal) {
-        alert('push 2 history');
         history.push(data.move);
     }
 }
@@ -72,14 +74,20 @@ function receiveData (conn) {
 function connect (id) {
     connection = peer.connect(id);
     connection.on('data', receiveData(connection));
+    connection.on('open', function(e) {
+        alert('woooooo u opened');
+        console.log(e);
+    });
+    connection.on('close', function(e) {
+        alert('u closed');
+        connect(otherId);
+    });
 }
 
 connect(otherId);
-connection.on('close', function() {
-    connect(otherId);
-});
 
 peer.on('connection', function (conn) {
     console.log('received other dude\'s connection');
     conn.on('data', receiveData(conn));
 })
+

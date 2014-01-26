@@ -16,7 +16,7 @@ rectSpacer = spacerw squareSize
 whoseTurn : Color -> Color -> String
 whoseTurn player turn =
     if turn == player then "Your"
-    else case player of
+    else case turn of
         Red -> "Red's"
         Black -> "Black's"
 

@@ -10,16 +10,6 @@ import Input
 import Mouse
 import String
 
-
---playerRequest = sendGet (lift3 (\http server id -> http ++ server ++ id) http server gameId)
-
---parseResponse response =
---    case response of
---        Success color -> Just color
---        Waiting -> Nothing
---        Failure code message -> Nothing
-
-
 initialState : State
 initialState = {turn = Red, pieces = allPieces, selected = Nothing, moved = False}
 

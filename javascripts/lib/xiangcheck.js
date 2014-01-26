@@ -45,6 +45,7 @@ checker.setTurn = function (turn) {
 function makeMove(piece, from, to) {
     position.remove(from).place(piece, to);
 }
+
 checker.isLegal = function (move, makingMove) {
   function legalPiece (piece) {
     return piece &&
@@ -59,9 +60,9 @@ checker.isLegal = function (move, makingMove) {
     if (legalPiece(piece)) {
       var moveList = piece.getMoves(position);
       if (moveList.indexOf(to) !== -1) {
-        makeMove(from, to);
+        makeMove(piece, from, to);
         var result = !position.isCheck;
-        makeMove(to, from);
+        makeMove(piece, to, from);
         return result;
       }
     }
