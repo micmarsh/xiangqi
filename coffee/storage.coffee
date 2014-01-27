@@ -30,8 +30,6 @@ System.create 'storage', do ->
                 waitForID ->
                     {key, value} = data
                     info = getInfo()
-                    console.log "setting if new!!"
-                    console.log info
                     if info and not info[key]?
                         info[key] = value
                         saveInfo info
@@ -42,7 +40,6 @@ System.create 'storage', do ->
                         {key, value} = data
                         info[key] = value
                         saveInfo info
-
             when 'get'
                 waitForID ->
                     info = getInfo()
@@ -51,7 +48,6 @@ System.create 'storage', do ->
                             type: data
                             data: info[data]
                         , self
-
             when 'id'
                 ID = data
                 saveInfo toSave
