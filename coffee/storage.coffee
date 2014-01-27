@@ -8,7 +8,7 @@ System.create 'storage', do ->
     PREFIX = 'xiangqi-'
     getInfo =  ->
         if ID
-            localStorage[PREFIX+ID]
+            JSON.parse(localStorage[PREFIX+ID] or "null")
         else
             toSave or { }
     saveInfo = (info) ->
