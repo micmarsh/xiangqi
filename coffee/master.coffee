@@ -6,6 +6,20 @@ master = System.create 'master',
                 legal: false,
                 move: {from: '0,0', to: '0,0'}
             connected: false
+
+        System.later ->
+            legality = System.get 'legality'
+            app.ports.outMoves.subscribe (move) ->
+                legality.send
+                    type: 'move'
+                    data: move
+                , master
+            app.ports.state.subscribe (state) ->
+                legality.send
+                    type: 'state'
+                    data: state
+                , master
+
         (message, s, self) ->
             {type, data} = message
             switch type
@@ -23,7 +37,6 @@ System.later ->
 
     # trigger a read of 'history', which
     # will get forwarded to 'inmoves'
-
     System.get('history').send
         type: 'get-history'
     , System.get 'inmoves'

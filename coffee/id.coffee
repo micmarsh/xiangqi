@@ -30,17 +30,20 @@ System.create 'id', do ->
     System.later ->
         storage = System.get 'storage'
         storage.send
-            type: 'save-color'
+            type: 'set-if-new'
             data:
-                id: currentId
-                color: playerColor
-        , System.get('id')
+                key: 'color'
+                value: playerColor
+        , System.blank
 
     (m, sender, self) ->
         switch m.type
             when 'get-color'
                 if needToConfirm
-                    System.get('storage').send m, sender
+                    System.get('storage').send
+                        type: 'get'
+                        data: 'color'
+                    , sender
                 else
                     sender.send
                         type: 'color'
@@ -51,5 +54,3 @@ System.create 'id', do ->
                     type: 'id'
                     data: currentId
                 , self
-            when 'saved'
-                console.log 'saved color'

@@ -1,8 +1,8 @@
 System.create 'inmoves', ({data, type}, sender, self) ->
+    #explicit parent
+    master = System.get('master')
     switch type
         when "history"
-            #explicit parent
-            master = System.get('master')
             for move in data
                 master.send
                     type: 'move'
@@ -11,3 +11,5 @@ System.create 'inmoves', ({data, type}, sender, self) ->
                         move
                     }
                 , self
+        when 'move'
+            master.send {data, type}, sender

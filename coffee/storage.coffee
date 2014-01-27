@@ -6,72 +6,55 @@ System.create 'storage', do ->
     toSave = null
     PREFIX = 'xiangqi-'
     getInfo =  ->
-        if ID
-            JSON.parse(localStorage[PREFIX+ID] or "null")
-        else
-            toSave or { }
+        JSON.parse(localStorage[PREFIX+ID] or "null")
+
     saveInfo = (info) ->
-        if ID
-            localStorage[PREFIX+ID] = JSON.stringify info
-        else
-            toSave = info
+        localStorage[PREFIX+ID] = JSON.stringify info
 
     System.later ->
         System.get('id').send
             type: 'get-id'
         , System.get('storage')
 
+    waitForID = (fn) ->
+        if ID
+            fn()
+        else
+            setTimeout ->
+                waitForID fn
+            , 10
+
     ({type, data}, sender, self) ->
         switch type
-
-            when 'set'
-                info = getInfo()
-                if info
+            when 'set-if-new'
+                waitForID ->
                     {key, value} = data
-                    info[key] = value
-                    setInfo info
+                    info = getInfo()
+                    console.log "setting if new!!"
+                    console.log info
+                    if info and not info[key]?
+                        info[key] = value
+                        saveInfo info
+            when 'set'
+                waitForID ->
+                    info = getInfo()
+                    if info
+                        {key, value} = data
+                        info[key] = value
+                        saveInfo info
 
             when 'get'
-                info = getInfo()
-                if info and info[data]
-                    sender.send
-                        type: data
-                        data: info[data]
-                    , self
+                waitForID ->
+                    info = getInfo()
+                    if info and info[data]
+                        sender.send
+                            type: data
+                            data: info[data]
+                        , self
 
             when 'id'
                 ID = data
                 saveInfo toSave
-
-            # when 'save-color'
-            #     {color} = data
-            #     info = getInfo()
-            #     if info
-            #         info.color = color
-            #     else
-            #         info = {color}
-            #     saveInfo info
-            #     sender.send {type: 'saved'}
-            # when 'get-color'
-            #     info = getInfo()
-            #     if info and info.color
-            #         sender.send
-            #             type: 'color'
-            #             data: info.color
-            # when 'push-history'
-            #     info = getInfo()
-            #     if info
-            #         info.history = [] unless info.history
-            #         info.history.push data
-            #         saveInfo info
-            # when 'get-history'
-            #     info = getInfo()
-            #     if info and info.history
-            #         sender.send
-            #             type: 'history'
-            #             data: info.history
-            #         , self
-
 
 
 
