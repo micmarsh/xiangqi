@@ -10,12 +10,11 @@
 # if it's actually new it'll save, if it already exists it'll
 # just ignore
 #
-# also, add a get-id receive, which returns what U want to sender
 
 System.create 'id', do ->
     #for node testing
     location = {}
-    location.hash = '#145o6'
+    location.hash = '#15o6'
 
     isGame = (id) ->
         typeof id is "string" and id.length is 5
@@ -23,25 +22,34 @@ System.create 'id', do ->
         Math.random().toString(36).substring 3, 8
     currentId = location.hash.slice(1) #to get rid of the "#"
     playerColor = "black"
-
     unless isGame currentId
         location.hash = "#" + (currentId = newId())
         playerColor = "red"
+    needToConfirm = playerColor is 'black'
+
+    System.later ->
+        storage = System.get 'storage'
+        storage.send
+            type: 'save-color'
+            data:
+                id: currentId
+                color: playerColor
+        , System.get('id')
 
     (m, sender, self) ->
         switch m.type
             when 'get-color'
-                #TODO a message to localstorage if game is not new
-                # a message to save color given appropriate conditions
-                # localstorage can for sure check if new
-                sender.send
-                    type: 'color'
-                    data: playerColor
-                ,self
+                if needToConfirm
+                    System.get('storage').send m, sender
+                else
+                    sender.send
+                        type: 'color'
+                        data: playerColor
+                    , self
             when 'get-id'
                 sender.send
                     type: 'id'
                     data: currentId
-                ,self
-
-
+                , self
+            when 'saved'
+                console.log 'saved'

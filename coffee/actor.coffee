@@ -12,3 +12,5 @@ System = do ->
         unless actor
             throw new Error "Actor \"#{name}\" doesn't exist"
         return actor
+    blank: send: ->
+    later: (fn) -> setTimeout fn, 0
