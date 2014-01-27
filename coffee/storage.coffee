@@ -3,10 +3,9 @@ System.create 'storage', do ->
     if System.test
         global.localStorage = { }
     ID = null
-    toSave = null
     PREFIX = 'xiangqi-'
     getInfo =  ->
-        JSON.parse(localStorage[PREFIX+ID] or "null")
+        JSON.parse(localStorage[PREFIX+ID] or "{ }")
 
     saveInfo = (info) ->
         localStorage[PREFIX+ID] = JSON.stringify info
@@ -22,7 +21,7 @@ System.create 'storage', do ->
         else
             setTimeout ->
                 waitForID fn
-            , 10
+            , 1
 
     ({type, data}, sender, self) ->
         switch type
@@ -30,28 +29,22 @@ System.create 'storage', do ->
                 waitForID ->
                     {key, value} = data
                     info = getInfo()
-                    if info and not info[key]?
+                    unless info[key]?
                         info[key] = value
                         saveInfo info
             when 'set'
                 waitForID ->
                     info = getInfo()
-                    if info
-                        {key, value} = data
-                        info[key] = value
-                        saveInfo info
+                    {key, value} = data
+                    info[key] = value
+                    saveInfo info
             when 'get'
                 waitForID ->
                     info = getInfo()
-                    if info and info[data]
+                    if info[data]
                         sender.send
                             type: data
                             data: info[data]
                         , self
             when 'id'
                 ID = data
-                saveInfo toSave
-
-
-
-

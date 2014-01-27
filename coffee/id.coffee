@@ -21,10 +21,12 @@ System.create 'id', do ->
     newId = ->
         Math.random().toString(36).substring 3, 8
     currentId = location.hash.slice(1) #to get rid of the "#"
+
     playerColor = "black"
     unless isGame currentId
         location.hash = "#" + (currentId = newId())
         playerColor = "red"
+
     needToConfirm = playerColor is 'black'
 
     System.later ->
@@ -38,17 +40,6 @@ System.create 'id', do ->
 
     (m, sender, self) ->
         switch m.type
-            when 'get-color'
-                if needToConfirm
-                    System.get('storage').send
-                        type: 'get'
-                        data: 'color'
-                    , sender
-                else
-                    sender.send
-                        type: 'color'
-                        data: playerColor
-                    , self
             when 'get-id'
                 sender.send
                     type: 'id'

@@ -3,9 +3,11 @@ System = do ->
     create: (name, onReceive) ->
         if actors[name]
             throw new Error "Actor \"#{name}\" already exists"
-        actors[name] = actor =
+        actors[name] = actor = {
+            name
             send: (message, sender) ->
                 onReceive(message, sender, actor)
+        }
         return actor
     get: (name) ->
         actor = actors[name]
