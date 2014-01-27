@@ -1,18 +1,27 @@
 #again, 4 node tests
-localStorage = { }
+# localStorage = { }
 
 
 System.create 'storage', do ->
     ID = null
+    toSave = null
     PREFIX = 'xiangqi-'
     getInfo =  ->
-        localStorage[PREFIX+ID]
+        if ID
+            localStorage[PREFIX+ID]
+        else
+            toSave or { }
     saveInfo = (info) ->
-        localStorage[PREFIX+ID] = info
+        if ID
+            localStorage[PREFIX+ID] = JSON.stringify info
+        else
+            toSave = info
+
     System.later ->
         System.get('id').send
             type: 'get-id'
         , System.get('storage')
+
     ({type, data}, sender, self) ->
         switch type
             when 'save-color'
@@ -45,6 +54,7 @@ System.create 'storage', do ->
                     , selfg
             when 'id'
                 ID = data
+                saveInfo toSave
 
 
 

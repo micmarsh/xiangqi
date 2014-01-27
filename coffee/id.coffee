@@ -13,8 +13,8 @@
 
 System.create 'id', do ->
     #for node testing
-    location = {}
-    location.hash = '#15o6'
+    # location = {}
+    # location.hash = '#15o6'
 
     isGame = (id) ->
         typeof id is "string" and id.length is 5
@@ -52,4 +52,4 @@ System.create 'id', do ->
                     data: currentId
                 , self
             when 'saved'
-                console.log 'saved'
+                console.log 'saved color'
