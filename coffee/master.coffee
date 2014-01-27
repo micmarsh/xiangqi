@@ -11,7 +11,7 @@ master = System.create 'master',
             legality = System.get 'legality'
             app.ports.outMoves.subscribe (move) ->
                 legality.send
-                    type: 'move'
+                    type: 'check-move'
                     data: move
                 , master
             app.ports.state.subscribe (state) ->
