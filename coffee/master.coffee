@@ -29,6 +29,8 @@ master = System.create 'master',
                     app.ports.inMoves.send data
                 when 'color'
                     app.ports.color.send data
+                when 'connected'
+                    app.ports.connected.send data
                 else
                     console.log("master recieved unknown message")
                     console.log(message)

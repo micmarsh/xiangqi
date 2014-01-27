@@ -24,6 +24,6 @@ System.create 'history', do ->
                         type: history
                         data: data or []
                     , self
-            when 'push-history'
+            when 'push'
                 pushing = data
                 self.send {type: 'get-history'}
