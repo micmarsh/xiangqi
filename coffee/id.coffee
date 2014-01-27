@@ -13,9 +13,9 @@
 
 System.create 'id', do ->
     #for node testing
-    # location = {}
-    # location.hash = '#15o6'
-
+    if System.test
+        global.location = {}
+        global.location.hash = '#15o6'
     isGame = (id) ->
         typeof id is "string" and id.length is 5
     newId = ->

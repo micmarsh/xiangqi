@@ -1,8 +1,7 @@
-#again, 4 node tests
-# localStorage = { }
-
 
 System.create 'storage', do ->
+    if System.test
+        global.localStorage = { }
     ID = null
     toSave = null
     PREFIX = 'xiangqi-'
@@ -24,37 +23,54 @@ System.create 'storage', do ->
 
     ({type, data}, sender, self) ->
         switch type
-            when 'save-color'
-                {color} = data
+
+            when 'set'
                 info = getInfo()
                 if info
-                    info.color = color
-                else
-                    info = {color}
-                saveInfo info
-                sender.send {type: 'saved'}
-            when 'get-color'
+                    {key, value} = data
+                    info[key] = value
+                    setInfo info
+
+            when 'get'
                 info = getInfo()
-                if info and info.color
+                if info and info[data]
                     sender.send
-                        type: 'color'
-                        data: info.color
-            when 'push-history'
-                info = getInfo()
-                if info
-                    info.history = [] unless info.history
-                    info.history.push data
-                    saveInfo info
-            when 'get-history'
-                info = getInfo()
-                if info and info.history
-                    sender.send
-                        type: 'history'
-                        data: info.history
-                    , selfg
+                        type: data
+                        data: info[data]
+                    , self
+
             when 'id'
                 ID = data
                 saveInfo toSave
+
+            # when 'save-color'
+            #     {color} = data
+            #     info = getInfo()
+            #     if info
+            #         info.color = color
+            #     else
+            #         info = {color}
+            #     saveInfo info
+            #     sender.send {type: 'saved'}
+            # when 'get-color'
+            #     info = getInfo()
+            #     if info and info.color
+            #         sender.send
+            #             type: 'color'
+            #             data: info.color
+            # when 'push-history'
+            #     info = getInfo()
+            #     if info
+            #         info.history = [] unless info.history
+            #         info.history.push data
+            #         saveInfo info
+            # when 'get-history'
+            #     info = getInfo()
+            #     if info and info.history
+            #         sender.send
+            #             type: 'history'
+            #             data: info.history
+            #         , self
 
 
 
