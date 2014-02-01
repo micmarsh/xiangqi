@@ -1,5 +1,11 @@
 System.create 'history', do ->
     pushing = false
+
+    System.later ->
+        System.get('history').send
+            type: 'get-history'
+        , System.get 'inmoves'
+
     (message, sender, self) ->
         storage = System.get('storage')
         switch message.type

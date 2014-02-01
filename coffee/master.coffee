@@ -36,16 +36,3 @@ master = System.create 'master',
                     console.log(message)
 
 
-System.later ->
-
-    # trigger a read of 'history', which
-    # will get forwarded to 'inmoves'
-    System.get('history').send
-        type: 'get-history'
-    , System.get 'inmoves'
-
-    # master should get color so it can
-    # send it into the color port
-    master.send
-        type: 'get-color'
-
