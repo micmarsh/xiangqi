@@ -27,7 +27,7 @@ System.create 'legality', do ->
                                 color: playerColor
                                 move: data
                     else
-                        System.get('inmoves').send
+                        sender.send
                             type: 'move'
                             data: {
                                 legal
