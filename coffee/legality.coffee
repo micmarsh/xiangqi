@@ -18,12 +18,12 @@ System.create 'legality', do ->
                 checker.setState pieces, turn
             when 'check-move'
                 if playerColor
-                    legal = checker.isLegal data, playerColor
+                    legal = checker.isLegal data, (data.color or playerColor)
                     # TODO: FANCY PEERJS STUFF
                     if legal and data.send
                         delete data.send
                         System.get('p2p').send
-                            type: 'move'
+                            type: 'check-move'
                             data:
                                 color: playerColor
                                 move: data

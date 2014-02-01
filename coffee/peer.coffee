@@ -3,12 +3,18 @@ System.create 'p2p', do ->
     id = null
     color = null
     other = null
+
+    connection = null
     prefix = 'xiangqi-'
 
-    registerConn = (conn, peer) ->
+
+    registerConn = (conn, peer, self) ->
         ->
-            conn.on 'data', (data) ->
-            # conn.on 'close', ->
+            conn.on 'data', ({type, data}) ->
+                switch type
+                    when 'check-move'
+
+
 
     wait = (fn) ->
         if id and color and other
@@ -19,14 +25,15 @@ System.create 'p2p', do ->
             ,1
 
     wait ->
+        self = System.get 'p2p'
         peer = new Peer prefix+color+id,
             key: '51am0fffupb0ggb9'
 
         peer.on 'connection', (conn) ->
-            do registerConn conn, peer
+            do registerConn conn, peer, self
 
-        conn = peer.connect prefix+other+id
-        conn.on 'open', registerConn conn, peer
+        connection = peer.connect prefix+other+id
+        connection.on 'open', registerConn connection, peer, self
 
 
     System.later ->
@@ -45,12 +52,5 @@ System.create 'p2p', do ->
             when 'color'
                 color = data
                 other = if color is 'red' then 'black' else 'red'
-            when 'move'
-                # TODO need to figure out a good mapping between this send/receive
-                # and the peer's connection's send/receive. Take a break 4 now
-                # Some thoughts: this part should send something to the peer connection,
-                # but getting things sent back remotely is muy dificil. May have to mess with some
-                # state to get things to happen in the proper order. Maybe worth starting over entirely
-                # with this actor
-                console.log "received move in p2p #{JSON.stringify data}"
-
+            when 'check-move', 'move'
+                connection.send {type, data}
