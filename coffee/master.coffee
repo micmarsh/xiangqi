@@ -10,6 +10,7 @@ master = System.create 'master',
         System.later ->
             legality = System.get 'legality'
             app.ports.outMoves.subscribe (move) ->
+                move.send = true
                 legality.send
                     type: 'check-move'
                     data: move

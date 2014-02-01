@@ -20,7 +20,8 @@ System.create 'legality', do ->
                 if playerColor
                     legal = checker.isLegal data, playerColor
                     # TODO: FANCY PEERJS STUFF
-                    if legal
+                    if legal and data.send
+                        delete data.send
                         System.get('p2p').send
                             type: 'move'
                             data:
