@@ -1,4 +1,4 @@
-master = System.create 'master',
+System.create 'master',
     do ->
         app = Elm.fullscreen Elm.Xiangqi,
             color: 'red'
@@ -9,6 +9,7 @@ master = System.create 'master',
 
         System.later ->
             legality = System.get 'legality'
+            master = System.get 'master'
             app.ports.outMoves.subscribe (move) ->
                 move.send = true
                 legality.send
