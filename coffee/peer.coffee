@@ -4,17 +4,21 @@ System.create 'p2p', do ->
     color = null
     other = null
 
+    checking = null
     connection = null
     prefix = 'xiangqi-'
 
 
     registerConn = (conn, peer, self) ->
         ->
-            conn.on 'data', ({type, data}) ->
-                switch type
+            conn.on 'data', (data) ->
+                console.log 'yo got some data from over there'
+                switch data.type
                     when 'check-move'
-
-
+                        System.get('legality').send data, self
+                    when 'move'
+                        checking.send data, self
+                        checking = null
 
     wait = (fn) ->
         if id and color and other
@@ -53,4 +57,9 @@ System.create 'p2p', do ->
                 color = data
                 other = if color is 'red' then 'black' else 'red'
             when 'check-move', 'move'
+                if type is 'check-move'
+                    console.log 'yo checking yo move'
+                else
+                    console.log 'about to send back to OG'
+                checking = sender if type is 'check-move'
                 connection.send {type, data}
