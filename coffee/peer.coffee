@@ -6,8 +6,19 @@ System.create 'p2p', do ->
 
     checking = null
     connection = null
-    prefix = 'xiangqi-'
 
+    connect = do ->
+        connections = {outgoing: false, incoming: false}
+        (which) ->
+            connections[which] = true
+            console.log 'woooooo connected '+which
+            {outgoing, incoming} = connections
+            if outgoing and incoming
+                System.get('master').send
+                    type: 'connected'
+                    data: true
+
+    prefix = 'xiangqi-'
 
     registerConn = (conn, peer, self) ->
         ->
@@ -34,10 +45,13 @@ System.create 'p2p', do ->
             key: '51am0fffupb0ggb9'
 
         peer.on 'connection', (conn) ->
+            connect 'incoming'
             do registerConn conn, peer, self
 
         connection = peer.connect prefix+other+id
-        connection.on 'open', registerConn connection, peer, self
+        connection.on 'open', ->
+            connect 'outgoing'
+            registerConn connection, peer, self
 
 
     System.later ->
