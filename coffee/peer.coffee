@@ -2,39 +2,6 @@
 System.create 'p2p', do ->
     id = null
     color = null
-    connected = false
-    connection = null
-
-    checker = require './lib/xiangcheck'
-
-    getOther = (color) ->
-        if color is 'red'
-            'black'
-        else
-            'red'
-
-    reconnect = ->
-        connection = peer.connect PREFIX+otherPlayer+id
-        connection.on 'open', -> connected = true
-        connection.on 'close', ->
-            connected = false
-            reconnect()
-
-    do connect = ->
-        if id and color
-            otherPlayer = getOther color
-            PREFIX = 'xiangqi-'
-            peer = new Peer PREFIX+color+id,
-                key: '51am0fffupb0ggb9'
-            reconnect()
-            setInterval ->
-                connected = connection.open
-                System.get('master').send
-                    type: 'connected'
-                    data: connected
-            , 1000
-        else
-            setTimeout connect, 10
 
     System.later ->
         self = System.get 'p2p'
