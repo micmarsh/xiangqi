@@ -7,16 +7,12 @@ System.create 'p2p', do ->
     checking = null
     connection = null
 
-    connect = do ->
-        connections = {outgoing: false, incoming: false}
-        (which) ->
-            connections[which] = true
-            console.log 'woooooo connected '+which
-            {outgoing, incoming} = connections
-            if outgoing and incoming
-                System.get('master').send
-                    type: 'connected'
-                    data: true
+    connect = (which) ->
+        console.log 'woooooo connected '+which
+        # if outgoing and incoming
+        System.get('master').send
+            type: 'connected'
+            data: true
 
     prefix = 'xiangqi-'
 
@@ -30,6 +26,8 @@ System.create 'p2p', do ->
                     when 'move'
                         checking.send data, self
                         checking = null
+            conn.on 'close', ->
+                alert 'u closed'
 
     wait = (fn) ->
         if id and color and other
@@ -46,6 +44,7 @@ System.create 'p2p', do ->
 
         peer.on 'connection', (conn) ->
             connect 'incoming'
+            connection = conn
             do registerConn conn, peer, self
 
         connection = peer.connect prefix+other+id
