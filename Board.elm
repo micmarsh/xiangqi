@@ -26,7 +26,7 @@ initialMove (row, col) = ( row - centerWidth, col - centerHeight)
 
 pieceName kind = case kind of
     King -> "king"
-    Soldier -> "soldier"
+    Soldier  -> "soldier"
     Advisor -> "advisor"
     Elephant -> "elephant"
     Cannon -> "cannon"

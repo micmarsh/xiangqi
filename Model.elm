@@ -38,7 +38,6 @@ findPiece pieces position =
     case pieces of
         [] -> Nothing
         (Piece t p c) :: rest ->
-            -- destructuring in lets is broken as poop, pull down fix sometime
             if (position == p) then Just (Piece t p c)
             else findPiece rest position
 
