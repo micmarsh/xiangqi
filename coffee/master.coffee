@@ -25,8 +25,6 @@ System.create 'master',
         (message, s, self) ->
             {type, data} = message
             switch type
-                when 'get-color'
-                    System.get('color').send message, self
                 when 'move'
                     app.ports.inMoves.send data
                 when 'color'

@@ -24,7 +24,7 @@ System.create 'p2p', do ->
                     checking = null
         conn.on 'close', ->
             alert 'u closed'
-            connect peer
+            connect peer, self
 
     wait = (fn) ->
         if id and color and other
@@ -34,7 +34,7 @@ System.create 'p2p', do ->
                 wait fn
             ,1
 
-    connect = (peer) ->
+    connect = (peer, self) ->
         connection = peer.connect prefix+other+id
         connection.on 'open', ->
             connected()
@@ -50,7 +50,7 @@ System.create 'p2p', do ->
             connection = conn
             registerConn conn, peer, self
 
-        connect peer
+        connect peer, self
 
 
     System.later ->
@@ -70,5 +70,8 @@ System.create 'p2p', do ->
                 color = data
                 other = if color is 'red' then 'black' else 'red'
             when 'check-move', 'move'
-                checking = sender if type is 'check-move'
+                if type is 'check-move'
+                    checking = sender
+                else
+                    System.get('master').send {type, data}
                 connection.send {type, data}
