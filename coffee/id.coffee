@@ -30,13 +30,11 @@ System.create 'id', do ->
     needToConfirm = playerColor is 'black'
 
     System.later ->
-        storage = System.get 'storage'
-        storage.send
-            type: 'set-if-new'
-            data:
-                key: 'color'
-                value: playerColor
-        , System.blank
+        color = System.get 'color'
+        color.send
+            type: 'set-color'
+            data: playerColor
+        , System.get 'master'
 
     (m, sender, self) ->
         switch m.type

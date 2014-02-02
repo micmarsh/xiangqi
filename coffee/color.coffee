@@ -13,3 +13,15 @@ System.create 'color', do ->
                     type: 'get'
                     data: 'color'
                 , sender
+            when 'set-color'
+                storage = System.get 'storage'
+                storage.send
+                    type: 'set-if-new'
+                    data:
+                        key: 'color'
+                        value: m.data
+                , self
+            when 'confirm-set'
+                self.send
+                    type: 'get-color'
+                , System.get('master')
