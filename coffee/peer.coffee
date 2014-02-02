@@ -17,7 +17,7 @@ System.create 'p2p', do ->
     confirm = (actor, data) ->
         delete data.move.color
         actor.send {
-            data: data
+            data
             type: 'confirmed'
         }
 
