@@ -1184,7 +1184,7 @@ Elm.Model.make = function (_elm)
                                                   case
                                                   "[]" :
                                                     return Maybe.Nothing;}
-                                                 _E.Case($moduleName,"between lines 38 and 43");
+                                                 _E.Case($moduleName,"between lines 38 and 42");
                                                }();
                                       });
                    var Black = {ctor: "Black"};
