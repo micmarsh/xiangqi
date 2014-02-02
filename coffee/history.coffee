@@ -11,10 +11,14 @@ System.create 'history', do ->
         switch message.type
             when 'get-history'
                 storage.send
-                    type: 'get'
-                    data: 'history'
+                    type: 'safe-get'
+                    data:
+                        key: 'history'
+                        backup: [ ]
                 , self
             when 'history'
+                {data} = message
+                console.log data
                 if pushing
                     history = (data or []).push pushing
                     storage.send

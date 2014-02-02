@@ -11,9 +11,10 @@ System.create 'storage', do ->
         localStorage[PREFIX+ID] = JSON.stringify info
 
     System.later ->
+        self = System.get 'storage'
         System.get('id').send
             type: 'get-id'
-        , System.get('storage')
+        , self
 
     waitForID = (fn) ->
         if ID
@@ -46,5 +47,13 @@ System.create 'storage', do ->
                             type: data
                             data: info[data]
                         , self
+            when 'safe-get'
+                waitForID ->
+                    info = getInfo()
+                    {key, backup} = data
+                    sender.send
+                        type: key
+                        data: info[key] or backup
+                    , self
             when 'id'
                 ID = data

@@ -15,7 +15,6 @@ System.create 'p2p', do ->
     prefix = 'xiangqi-'
 
     confirm = (actor, data) ->
-        console.log data
         delete data.move.color
         actor.send {
             data: data

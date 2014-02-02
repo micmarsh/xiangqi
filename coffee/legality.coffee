@@ -35,10 +35,7 @@ System.create 'legality', do ->
                             }
                         , self
             when 'confirmed'
-                # Type check: this probably sends
-                # {legal:bool, move:...} formatted data
                 {move} = data
-                console.log "yo the data in confirmed #{JSON.stringify data}"
                 System.get('history').send
                     type: 'push'
                     data: move
