@@ -20,12 +20,12 @@ System.create 'history', do ->
                 {data} = message
                 console.log data
                 if pushing
-                    history = (data or []).push pushing
+                    data.push pushing
                     storage.send
                         type: 'set'
                         data:
                             key: 'history'
-                            value: history
+                            value: data
                     , self
                     pushing = false
                 else
