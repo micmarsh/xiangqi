@@ -14,16 +14,21 @@ System.create 'p2p', do ->
 
     prefix = 'xiangqi-'
 
+    confirm = (actor, data) ->
+        console.log data
+        delete data.move.color
+        actor.send {
+            data: data
+            type: 'confirmed'
+        }
+
     registerConn = (conn, peer, self) ->
         conn.on 'data', (data) ->
             switch data.type
                 when 'check-move'
                     System.get('legality').send data, self
                 when 'move'
-                    checking.send {
-                        data
-                        type: 'confirmed'
-                    }, self
+                    confirm checking, data.data
                     checking = null
         conn.on 'close', ->
             alert 'u closed'
@@ -76,8 +81,5 @@ System.create 'p2p', do ->
                 if type is 'check-move'
                     checking = sender
                 else
-                    System.get('legality').send {
-                        data
-                        type: 'confirmed'
-                    }
+                    confirm System.get('legality'), data
                 connection.send {type, data}
