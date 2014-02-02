@@ -12,17 +12,15 @@ System.create 'legality', do ->
     ({type, data}, sender, self) ->
         switch type
             when 'color'
-                console.log 'woah got some color'
                 playerColor = data
             when 'state'
                 {pieces, turn} = data
                 checker.setState pieces, turn
             when 'check-move'
                 if playerColor
-                    console.log "cheeeck"
                     console.log data
                     legal = checker.isLegal data, (data.color or playerColor)
-                    # TODO: FANCY PEERJS STUFF
+                    console.log legal
                     if legal and data.send
                         delete data.send
                         data.color = playerColor

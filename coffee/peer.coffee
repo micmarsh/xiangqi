@@ -16,18 +16,15 @@ System.create 'p2p', do ->
 
     registerConn = (conn, peer, self) ->
         conn.on 'data', (data) ->
-            console.log 'yo got some data from over there'
             switch data.type
                 when 'check-move'
                     System.get('legality').send data, self
                 when 'move'
-                    console.log "yo here's the move b4 u send it back"
-                    console.log data
                     checking.send data, self
                     checking = null
         conn.on 'close', ->
             alert 'u closed'
-            connect()
+            connect peer
 
     wait = (fn) ->
         if id and color and other
@@ -37,7 +34,7 @@ System.create 'p2p', do ->
                 wait fn
             ,1
 
-    connect = ->
+    connect = (peer) ->
         connection = peer.connect prefix+other+id
         connection.on 'open', ->
             connected()
@@ -53,7 +50,7 @@ System.create 'p2p', do ->
             connection = conn
             registerConn conn, peer, self
 
-        connect()
+        connect peer
 
 
     System.later ->
@@ -73,10 +70,5 @@ System.create 'p2p', do ->
                 color = data
                 other = if color is 'red' then 'black' else 'red'
             when 'check-move', 'move'
-                if type is 'check-move'
-                    console.log 'yo checking yo move'
-                else
-                    console.log 'about to send back to OG'
-                    console.log data
                 checking = sender if type is 'check-move'
                 connection.send {type, data}

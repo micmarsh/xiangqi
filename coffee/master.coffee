@@ -28,8 +28,6 @@ System.create 'master',
                 when 'get-color'
                     System.get('color').send message, self
                 when 'move'
-                    console.log s
-                    console.log data
                     app.ports.inMoves.send data
                 when 'color'
                     app.ports.color.send data
