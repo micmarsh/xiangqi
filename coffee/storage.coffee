@@ -33,11 +33,11 @@ System.create 'storage', do ->
                     unless info[key]?
                         info[key] = value
                         saveInfo info
-                if sender
-                    sender.send {
-                        data
-                        type: 'confirm-set'
-                    }, self
+                    if sender
+                        sender.send {
+                            data
+                            type: 'confirm-set'
+                        }, self
             when 'set'
                 waitForID ->
                     info = getInfo()
