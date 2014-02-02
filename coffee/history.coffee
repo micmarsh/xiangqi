@@ -20,7 +20,8 @@ System.create 'history', do ->
             when 'history'
                 {data} = message
                 if pushing
-                    console.log 'pushing 4 reals'
+                    console.log 'pushing'
+                    data.push pushing
                     storage.send
                         type: 'set'
                         data:
