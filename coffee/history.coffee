@@ -31,5 +31,5 @@ System.create 'history', do ->
                         data: data or []
                     , self
             when 'push'
-                pushing = data
+                pushing = message.data
                 self.send {type: 'get-history'}

@@ -32,7 +32,9 @@ System.create 'master',
                 when 'connected'
                     app.ports.connected.send data
                 else
-                    console.log("master recieved unknown message")
-                    console.log(message)
+                    console.log "master recieved unknown message"
+                    console.log message
+                    console.log 'sent by'
+                    console.log s
 
 

@@ -20,7 +20,12 @@ System.create 'p2p', do ->
                 when 'check-move'
                     System.get('legality').send data, self
                 when 'move'
-                    checking.send data, self
+                    console.log "who's checking?"
+                    console.log checking
+                    checking.send {
+                        data
+                        type: 'confirmed'
+                    }, self
                     checking = null
         conn.on 'close', ->
             alert 'u closed'
@@ -73,5 +78,8 @@ System.create 'p2p', do ->
                 if type is 'check-move'
                     checking = sender
                 else
-                    System.get('master').send {type, data}
+                    System.get('legality').send {
+                        data
+                        type: 'confirmed'
+                    }
                 connection.send {type, data}

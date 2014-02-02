@@ -27,7 +27,7 @@ System.create 'legality', do ->
                         System.get('p2p').send {
                             data
                             type: 'check-move'
-                        }, sender
+                        }, self
                     else
                         sender.send
                             type: 'move'
