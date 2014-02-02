@@ -20,8 +20,6 @@ System.create 'p2p', do ->
                 when 'check-move'
                     System.get('legality').send data, self
                 when 'move'
-                    console.log "who's checking?"
-                    console.log checking
                     checking.send {
                         data
                         type: 'confirmed'

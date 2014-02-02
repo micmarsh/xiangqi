@@ -18,9 +18,7 @@ System.create 'legality', do ->
                 checker.setState pieces, turn
             when 'check-move'
                 if playerColor
-                    console.log data
                     legal = checker.isLegal data, (data.color or playerColor)
-                    console.log legal
                     if legal and data.send
                         delete data.send
                         data.color = playerColor
@@ -40,6 +38,7 @@ System.create 'legality', do ->
                 # Type check: this probably sends
                 # {legal:bool, move:...} formatted data
                 {move} = data
+                console.log "yo the data in confirmed #{JSON.stringify data}"
                 System.get('history').send
                     type: 'push'
                     data: move
