@@ -9,7 +9,7 @@ System.create 'legality', do ->
             type: 'get-color'
         , System.get('legality')
 
-    ({type, data}, sender) ->
+    ({type, data}, sender, self) ->
         switch type
             when 'color'
                 console.log 'woah got some color'
@@ -19,15 +19,17 @@ System.create 'legality', do ->
                 checker.setState pieces, turn
             when 'check-move'
                 if playerColor
+                    console.log "cheeeck"
+                    console.log data
                     legal = checker.isLegal data, (data.color or playerColor)
                     # TODO: FANCY PEERJS STUFF
                     if legal and data.send
                         delete data.send
-                        System.get('p2p').send
+                        data.color = playerColor
+                        System.get('p2p').send {
+                            data
                             type: 'check-move'
-                            data:
-                                color: playerColor
-                                move: data
+                        }, sender
                     else
                         sender.send
                             type: 'move'
@@ -35,6 +37,7 @@ System.create 'legality', do ->
                                 legal
                                 move: data
                             }
+                        , self
             when 'confirmed'
                 # Type check: this probably sends
                 # {legal:bool, move:...} formatted data

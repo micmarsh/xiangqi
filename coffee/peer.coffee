@@ -7,9 +7,7 @@ System.create 'p2p', do ->
     checking = null
     connection = null
 
-    connect = (which) ->
-        console.log 'woooooo connected '+which
-        # if outgoing and incoming
+    connected = ->
         System.get('master').send
             type: 'connected'
             data: true
@@ -17,17 +15,19 @@ System.create 'p2p', do ->
     prefix = 'xiangqi-'
 
     registerConn = (conn, peer, self) ->
-        ->
-            conn.on 'data', (data) ->
-                console.log 'yo got some data from over there'
-                switch data.type
-                    when 'check-move'
-                        System.get('legality').send data, self
-                    when 'move'
-                        checking.send data, self
-                        checking = null
-            conn.on 'close', ->
-                alert 'u closed'
+        conn.on 'data', (data) ->
+            console.log 'yo got some data from over there'
+            switch data.type
+                when 'check-move'
+                    System.get('legality').send data, self
+                when 'move'
+                    console.log "yo here's the move b4 u send it back"
+                    console.log data
+                    checking.send data, self
+                    checking = null
+        conn.on 'close', ->
+            alert 'u closed'
+            connect()
 
     wait = (fn) ->
         if id and color and other
@@ -37,20 +37,23 @@ System.create 'p2p', do ->
                 wait fn
             ,1
 
+    connect = ->
+        connection = peer.connect prefix+other+id
+        connection.on 'open', ->
+            connected()
+            registerConn connection, peer, self
+
     wait ->
         self = System.get 'p2p'
         peer = new Peer prefix+color+id,
             key: '51am0fffupb0ggb9'
 
         peer.on 'connection', (conn) ->
-            connect 'incoming'
+            connected()
             connection = conn
-            do registerConn conn, peer, self
+            registerConn conn, peer, self
 
-        connection = peer.connect prefix+other+id
-        connection.on 'open', ->
-            connect 'outgoing'
-            do registerConn connection, peer, self
+        connect()
 
 
     System.later ->
@@ -74,6 +77,6 @@ System.create 'p2p', do ->
                     console.log 'yo checking yo move'
                 else
                     console.log 'about to send back to OG'
-                    console.log connection
+                    console.log data
                 checking = sender if type is 'check-move'
                 connection.send {type, data}
