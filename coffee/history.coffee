@@ -18,9 +18,7 @@ System.create 'history', do ->
                 , self
             when 'history'
                 {data} = message
-                console.log data
                 if pushing
-                    data.push pushing
                     storage.send
                         type: 'set'
                         data:
@@ -31,7 +29,7 @@ System.create 'history', do ->
                 else
                     #explicit parent
                     System.get('inmoves').send
-                        type: history
+                        type: 'history'
                         data: data or []
                     , self
             when 'push'
