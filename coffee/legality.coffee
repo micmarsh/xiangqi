@@ -2,6 +2,7 @@ System.create 'legality', do ->
     # THE REASON WE NEED BROWSERIFY
     checker = require './lib/xiangcheck'
     # *****************************
+
     playerColor = null
     System.later ->
         System.get('color').send

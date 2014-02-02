@@ -50,7 +50,7 @@ System.create 'p2p', do ->
         connection = peer.connect prefix+other+id
         connection.on 'open', ->
             connect 'outgoing'
-            registerConn connection, peer, self
+            do registerConn connection, peer, self
 
 
     System.later ->
@@ -74,5 +74,6 @@ System.create 'p2p', do ->
                     console.log 'yo checking yo move'
                 else
                     console.log 'about to send back to OG'
+                    console.log connection
                 checking = sender if type is 'check-move'
                 connection.send {type, data}
