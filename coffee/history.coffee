@@ -10,7 +10,6 @@ System.create 'history', do ->
         storage = System.get('storage')
         switch message.type
             when 'get-history'
-                console.log 'getting history'
                 storage.send
                     type: 'safe-get'
                     data:
@@ -20,7 +19,6 @@ System.create 'history', do ->
             when 'history'
                 {data} = message
                 if pushing
-                    console.log 'pushing'
                     data.push pushing
                     storage.send
                         type: 'set'
@@ -36,6 +34,5 @@ System.create 'history', do ->
                         data: data or []
                     , self
             when 'push'
-                console.log 'pushing data'
                 pushing = message.data
                 self.send {type: 'get-history'}
