@@ -58,6 +58,10 @@ checker.isLegal = isLegal = function (move, makingMove) {
     piece.color === position.toMove;
   }
 
+  if(piece.type === 'Cannon') {
+    console.log('wtf cannon');
+  }
+
   if (position) {
     var from = move.from;
     var to = move.to;
@@ -92,7 +96,6 @@ checker.isCheckmate = function () {
         move = {from: pos, to: move};
         return isLegal(move, position.toMove);
       });
-      ;
       if(moves.length !== 0) {
         return false
       }
