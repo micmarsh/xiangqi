@@ -6,6 +6,7 @@ System.create 'master',
                 legal: false,
                 move: {from: '0,0', to: '0,0'}
             connected: false
+            check: {check: false, mate: false, checker: 'red'}
 
         System.later ->
             legality = System.get 'legality'
@@ -30,6 +31,8 @@ System.create 'master',
         (message, s, self) ->
             {type, data} = message
             switch type
+                when 'check'
+                    app.ports.check.send data
                 when 'move'
                     app.ports.inMoves.send data
                 when 'color'

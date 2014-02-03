@@ -42,6 +42,10 @@ checker.setTurn = function (turn) {
   }
 }
 
+checker.getTurn = function () {
+  return position.toMove;
+}
+
 function makeMove(piece, from, to) {
     position.remove(from).place(piece, to);
 }

@@ -36,6 +36,13 @@ System.create 'legality', do ->
                         , self
             when 'confirmed'
                 {move} = data
+                check =
+                    check: checker.isCheck()
+                    mate: checker.isCheckmate()
+                    checker: checker.getTurn()
+                System.get('master').send
+                    type: 'check'
+                    data: check
                 System.get('history').send
                     type: 'push'
                     data: move

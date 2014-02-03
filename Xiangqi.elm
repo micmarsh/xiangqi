@@ -9,6 +9,7 @@ import Window
 port color : Signal String
 port inMoves : Signal {legal: Bool, move: {from: String, to: String}}
 port connected : Signal Bool
+port check : Signal {check: Bool, mate: Bool, checker: String}
 
 inputs = {
         color = color,
