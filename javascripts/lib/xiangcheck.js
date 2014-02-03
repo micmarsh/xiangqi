@@ -94,6 +94,9 @@ checker.isCheckmate = function () {
         return isLegal(move, position.toMove);
       });
       result = moves.length === 0;
+      if(!result) {
+        break;
+      }
     }
   }
   return result
