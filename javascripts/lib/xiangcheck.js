@@ -46,7 +46,8 @@ function makeMove(piece, from, to) {
     position.remove(from).place(piece, to);
 }
 
-checker.isLegal = function (move, makingMove) {
+var isLegal;
+checker.isLegal = isLegal = function (move, makingMove) {
   function legalPiece (piece) {
     return piece &&
     piece.color === makingMove &&
@@ -73,5 +74,28 @@ checker.isLegal = function (move, makingMove) {
 checker.isCheck = function () {
   return position.isCheck;
 }
+
+checker.isCheckmate = function () {
+  var pos,
+      move,
+      piece,
+      moves,
+      result = true;
+  for (pos in position) {
+    piece = position[pos];
+    if (piece.color === position.toMove) {
+      moves = piece.getMoves(position);
+      moves = moves.map(function (move) {
+        return {from: pos, to: move};
+      }).filter(function (move) {
+        return isLegal(move, position.toMove);
+      });
+      result = moves.length === 0;
+    }
+  }
+  return result
+}
+
+window.butt = checker.isCheckmate
 
 module.exports = checker;
