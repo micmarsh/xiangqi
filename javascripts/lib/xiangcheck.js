@@ -58,15 +58,14 @@ checker.isLegal = isLegal = function (move, makingMove) {
     piece.color === position.toMove;
   }
 
-  if(piece.type === 'Cannon') {
-    console.log('wtf cannon');
-  }
-
   if (position) {
     var from = move.from;
     var to = move.to;
     var piece = position[from];
     if (legalPiece(piece)) {
+        if(piece.type === 'Cannon') {
+          console.log('wtf cannon');
+        }
       var moveList = piece.getMoves(position);
       if (moveList.indexOf(to) !== -1) {
         makeMove(piece, from, to);
