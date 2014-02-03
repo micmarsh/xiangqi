@@ -82,8 +82,6 @@ updateStatus new prev =
     else if prev == Connected then Disconnected
     else Disconnected
 
-
-
 makeSideBar gameState color connected =
     let turnViews = makeTurnView gameState color
         connStatus = foldp updateStatus Waiting connected
