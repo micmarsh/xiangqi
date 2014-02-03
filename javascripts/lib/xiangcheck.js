@@ -89,9 +89,8 @@ checker.isCheckmate = function () {
     piece = position[pos];
     if (piece.color === position.toMove) {
       moves = piece.getMoves(position);
-      moves = moves.map(function (move) {
-        return {from: pos, to: move};
-      }).filter(function (move) {
+      moves = moves.filter(function (move) {
+        move = {from: pos, to: move};
         return isLegal(move, position.toMove);
       });
       result = moves.length === 0;
