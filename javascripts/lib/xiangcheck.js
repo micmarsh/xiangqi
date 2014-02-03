@@ -83,8 +83,7 @@ checker.isCheckmate = function () {
   var pos,
       move,
       piece,
-      moves,
-      result = true;
+      moves;
   for (pos in position) {
     piece = position[pos];
     if (piece.color === position.toMove) {
@@ -93,15 +92,13 @@ checker.isCheckmate = function () {
         move = {from: pos, to: move};
         return isLegal(move, position.toMove);
       });
-      result = moves.length === 0;
-      if(!result) {
-        break;
+      ;
+      if(moves.length !== 0) {
+        return false
       }
     }
   }
-  return result
+  return true;
 }
-
-window.butt = checker.isCheckmate
 
 module.exports = checker;
