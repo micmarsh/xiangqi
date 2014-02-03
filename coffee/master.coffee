@@ -22,6 +22,11 @@ System.create 'master',
                     data: state
                 , master
 
+        for event in ['online', 'offline']
+            window["on#{event}"] = ->
+                online = event is 'online'
+                app.ports.connected.send online
+
         (message, s, self) ->
             {type, data} = message
             switch type
@@ -36,5 +41,6 @@ System.create 'master',
                     console.log message
                     console.log 'sent by'
                     console.log s
+
 
 

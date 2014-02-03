@@ -7,7 +7,7 @@ System.create 'p2p', do ->
     checking = null
     connection = null
 
-    connected = ->
+    connected = (value = true) ->
         System.get('master').send
             type: 'connected'
             data: true
@@ -30,7 +30,7 @@ System.create 'p2p', do ->
                     confirm checking, data.data
                     checking = null
         conn.on 'close', ->
-            alert 'u closed'
+            connected false
             connect peer, self
 
     wait = (fn) ->

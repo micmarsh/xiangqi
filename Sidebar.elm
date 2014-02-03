@@ -61,16 +61,33 @@ makeTurnView gameState color  =
         turnText =  lift applyColor <| lift2 whoseTurn playerColor (lift .turn gameState)
     in lift turnMessage turnText
 
-disconnected : Element
-disconnected = (text . applyColor) "Waiting for other player..."
+waiting = (text . applyColor) "Waiting for other player..."
+disconnected = (text . (color red) . toText) "Disconnected"
 
-makeTitle : Element -> Bool -> Element
+makeTitle : Element -> Status -> Element
 makeTitle turnView connected =
-    if connected then turnView else disconnected
+    case connected of
+        Waiting -> waiting
+        Connected -> turnView
+        Disconnected -> disconnected
+
+data Status = Waiting |
+              Connected |
+              Disconnected
+
+updateStatus : Bool -> Status -> Status
+updateStatus new prev =
+    if new then Connected
+    else if prev == Waiting then Waiting
+    else if prev == Connected then Disconnected
+    else Disconnected
+
+
 
 makeSideBar gameState color connected =
     let turnViews = makeTurnView gameState color
-        titleViews = lift2 makeTitle turnViews connected
+        connStatus = foldp updateStatus Waiting connected
+        titleViews = lift2 makeTitle turnViews connStatus
         selectedPiece = lift .selected gameState
         pieceViews = lift makePieceView selectedPiece
         unsizedSidebar = lift2 putTogether titleViews pieceViews
