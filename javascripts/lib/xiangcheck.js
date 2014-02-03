@@ -70,4 +70,8 @@ checker.isLegal = function (move, makingMove) {
   return false;
 }
 
+checker.isCheck = function () {
+  return position.isCheck;
+}
+
 module.exports = checker;

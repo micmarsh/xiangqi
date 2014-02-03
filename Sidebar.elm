@@ -64,16 +64,16 @@ makeTurnView gameState color  =
 waiting = (text . applyColor) "Waiting for other player..."
 disconnected = (text . (color red) . toText) "Disconnected"
 
+data Status = Waiting |
+              Connected |
+              Disconnected
+
 makeTitle : Element -> Status -> Element
 makeTitle turnView connected =
     case connected of
         Waiting -> waiting
         Connected -> turnView
         Disconnected -> disconnected
-
-data Status = Waiting |
-              Connected |
-              Disconnected
 
 updateStatus : Bool -> Status -> Status
 updateStatus new prev =
