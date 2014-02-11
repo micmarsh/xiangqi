@@ -20,7 +20,7 @@ stateInputs = {
 port outMoves : Signal {from : String, to : String}
 port outMoves = makeMoves inputs
 
-gameState = makeGame inputs
+gameState = makeGame stateInputs
 
 pieces2List = map piece2List
 pieces = lift (pieces2List . .pieces) gameState
