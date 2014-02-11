@@ -14,7 +14,10 @@ type Move = (Position, Position)
 data Color = Red | Black
 data Piece = Piece Type Position Color
 
-type State = {turn : Color, pieces : [Piece], selected: Maybe Piece, moved: Bool}
+data Check = Check Color |
+             CheckMate Color 
+
+type State = {turn : Color, pieces : [Piece], selected: Maybe Piece, moved: Bool, check: Maybe Check }
 
 soldier char = Piece Soldier (char, 4) Red
 soldiers = map soldier soldierLetters

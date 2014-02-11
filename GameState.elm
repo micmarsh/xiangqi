@@ -11,7 +11,7 @@ import Mouse
 import String
 
 initialState : State
-initialState = {turn = Red, pieces = allPieces, selected = Nothing, moved = False}
+initialState = {turn = Red, pieces = allPieces, selected = Nothing, moved = False, check = Nothing}
 
 choosePos : Color -> Position -> Position -> Position
 choosePos player redPos blackPos =
