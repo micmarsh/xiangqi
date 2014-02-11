@@ -89,7 +89,7 @@ checkText player check =
     let makeText = (text . applyColor)
     in case check of
         Just (Check color) ->
-            if (not (color == player)) then makeText "You're in check!"
+            if (color == player) then makeText "You're in check!"
             else shortSpacer
         _ -> shortSpacer
 
