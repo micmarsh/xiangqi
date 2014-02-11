@@ -23,9 +23,10 @@ System.create 'master',
                 , master
 
         for event in ['online', 'offline']
-            window["on#{event}"] = ->
-                online = event is 'online'
-                app.ports.connected.send online
+            do (event) ->
+                window["on#{event}"] = ->
+                    online = event is 'online'
+                    app.ports.connected.send online
 
         (message, s, self) ->
             {type, data} = message
