@@ -1,6 +1,6 @@
 module GameState where
 import Model (Color, Red, Black, Position, Piece,
-    allPieces, findPiece, State, Move, playerADT)
+    allPieces, findPiece, State, Move, playerADT, Check, CheckMate)
 import Moving (makeMove)
 import Monad (map)
 import Http (Success, Waiting, Failure, sendGet)
@@ -65,9 +65,20 @@ toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
 
-makeGame {color, moves} =
+calculateCheck state {check, mate, checker} =
+    let color = playerADT checker 
+    in if mate then Just (CheckMate color)
+       else if check then Just (Check color)
+       else Nothing 
+
+addCheckToState state check = {state |
+        check <- calculateCheck state check
+    }
+
+makeGame {color, moves, checkStatus} =
     let boardMoves = lift convertMoveRecord moves
         onlyMoves = foldp handleLegalMove initialState boardMoves
         clickPosition = makeClicks color
-    in lift2 selectPiece onlyMoves clickPosition
+        withSelected = lift2 selectPiece onlyMoves clickPosition
+    in lift2 addCheckToState withSelected checkStatus
 
