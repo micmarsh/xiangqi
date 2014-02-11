@@ -18,7 +18,7 @@ stateInputs = {
     }
 
 port outMoves : Signal {from : String, to : String}
-port outMoves = makeMoves inputs
+port outMoves = makeMoves stateInputs
 
 gameState = makeGame stateInputs
 
