@@ -23,7 +23,7 @@ System.create 'master',
                     data: state
                 , master
 
-     j   for event in ['online', 'offline']
+        for event in ['online', 'offline']
             do (event) ->
                 window["on#{event}"] = ->
                     online = event is 'online'
