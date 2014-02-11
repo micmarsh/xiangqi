@@ -16,6 +16,13 @@ System.create 'legality', do ->
             when 'state'
                 {pieces, turn} = data
                 checker.setState pieces, turn
+                check =
+                    check: checker.isCheck()
+                    mate: checker.isCheckmate()
+                    checker: turn
+                System.get('master').send
+                    type: 'check'
+                    data: check
             when 'check-move'
                 if playerColor
                     legal = checker.isLegal data, (data.color or playerColor)

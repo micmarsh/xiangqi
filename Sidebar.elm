@@ -1,7 +1,7 @@
 module Sidebar where
 
 --import GameState (gameState, playerColor)
-import Model (Red, Black, Piece, Color, playerADT)
+import Model (Red, Black, Piece, Color, playerADT, Check)
 import Constants (sideBarWidth, squareSize)
 import Board (pieceImage)
 import Monad as M
@@ -12,6 +12,7 @@ spacerw = spacer sideBarWidth
 
 squareSpacer = spacerw sideBarWidth
 rectSpacer = spacerw squareSize
+shortSpacer = spacerw  <| squareSize `div` 3
 
 whoseTurn : Color -> Color -> String
 whoseTurn player turn =
@@ -49,10 +50,11 @@ makePieceView option =
                 biggerImage
             ]
 
-putTogether turn piece =
+putTogether turn piece check =
     flow down [
         rectSpacer,
         turn,
+        check,
         piece
     ]
 
@@ -64,16 +66,16 @@ makeTurnView gameState color  =
 waiting = (text . applyColor) "Waiting for other player..."
 disconnected = (text . (color red) . toText) "Disconnected"
 
+data Status = Waiting |
+              Connected |
+              Disconnected
+
 makeTitle : Element -> Status -> Element
 makeTitle turnView connected =
     case connected of
         Waiting -> waiting
         Connected -> turnView
         Disconnected -> disconnected
-
-data Status = Waiting |
-              Connected |
-              Disconnected
 
 updateStatus : Bool -> Status -> Status
 updateStatus new prev =
@@ -82,11 +84,21 @@ updateStatus new prev =
     else if prev == Connected then Disconnected
     else Disconnected
 
-makeSideBar gameState color connected =
+checkText : Color -> Maybe Check -> Element
+checkText player check =
+    let makeText = (text . applyColor)
+    in case check of
+        Just (Check color) ->
+            if (color == player) then makeText "You're in check!"
+            else shortSpacer
+        _ -> shortSpacer
+
+makeSideBar {gameState, color, connected} =
     let turnViews = makeTurnView gameState color
         connStatus = foldp updateStatus Waiting connected
         titleViews = lift2 makeTitle turnViews connStatus
         selectedPiece = lift .selected gameState
         pieceViews = lift makePieceView selectedPiece
-        unsizedSidebar = lift2 putTogether titleViews pieceViews
+        checkMessage = lift2 checkText (lift playerADT color) (lift .check gameState)
+        unsizedSidebar = lift3 putTogether titleViews pieceViews checkMessage
     in lift (width sideBarWidth) unsizedSidebar

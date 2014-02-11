@@ -42,11 +42,16 @@ checker.setTurn = function (turn) {
   }
 }
 
+checker.getTurn = function () {
+  return position.toMove;
+}
+
 function makeMove(piece, from, to) {
     position.remove(from).place(piece, to);
 }
 
-checker.isLegal = function (move, makingMove) {
+var isLegal;
+checker.isLegal = isLegal = function (move, makingMove) {
   function legalPiece (piece) {
     return piece &&
     piece.color === makingMove &&
@@ -58,6 +63,9 @@ checker.isLegal = function (move, makingMove) {
     var to = move.to;
     var piece = position[from];
     if (legalPiece(piece)) {
+        if(piece.type === 'Cannon') {
+          console.log('wtf cannon');
+        }
       var moveList = piece.getMoves(position);
       if (moveList.indexOf(to) !== -1) {
         makeMove(piece, from, to);
@@ -68,6 +76,31 @@ checker.isLegal = function (move, makingMove) {
     }
   }
   return false;
+}
+
+checker.isCheck = function () {
+  return position.isCheck;
+}
+
+checker.isCheckmate = function () {
+  var pos,
+      move,
+      piece,
+      moves;
+  for (pos in position) {
+    piece = position[pos];
+    if (piece.color === position.toMove) {
+      moves = piece.getMoves(position);
+      moves = moves.filter(function (move) {
+        move = {from: pos, to: move};
+        return isLegal(move, position.toMove);
+      });
+      if(moves.length !== 0) {
+        return false
+      }
+    }
+  }
+  return true;
 }
 
 module.exports = checker;
