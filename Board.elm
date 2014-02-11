@@ -64,7 +64,7 @@ imageWithPieces pieces turn =
 edgeOffset = 60
 collageBounds = collage (boardWidth + edgeOffset) (boardHeight + edgeOffset)
 
-makeBoard gameState color =
+makeBoard {gameState, color} =
     let pieces = lift .pieces gameState
         player = lift playerADT color
         realDisplay = lift2 imageWithPieces pieces <| player

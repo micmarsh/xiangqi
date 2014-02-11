@@ -11,9 +11,10 @@ port inMoves : Signal {legal: Bool, move: {from: String, to: String}}
 port connected : Signal Bool
 port check : Signal {check: Bool, mate: Bool, checker: String}
 
-inputs = {
+stateInputs = {
         color = color,
-        moves = inMoves
+        moves = inMoves,
+        checkStatus = check
     }
 
 port outMoves : Signal {from : String, to : String}
@@ -34,9 +35,15 @@ centeredContainer = lift2 container Window.width Window.height
 rlift : Signal (a -> b) -> a  -> Signal b
 rlift functions c = functions ~ (constant c)
 
-boardCanvas = makeBoard gameState color
+uiInputs = {
+        gameState = gameState,
+        color = color, 
+        connected = connected
+    }
 
-sidebar = makeSideBar gameState color connected
+boardCanvas = makeBoard uiInputs
+
+sidebar = makeSideBar uiInputs
 
 toDisplay = lift2 (\board sidebar -> flow right [board, sidebar]) boardCanvas sidebar
 
