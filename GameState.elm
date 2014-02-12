@@ -65,8 +65,8 @@ toggleTurn turn = case turn of
     Red -> Black
     Black -> Red
 
-calculateCheck state {check, mate, checker} =
-    let color = playerADT checker 
+calculateCheck state {check, mate, inCheck} =
+    let color = playerADT inCheck 
     in if mate then Just (CheckMate color)
        else if check then Just (Check color)
        else Nothing 
