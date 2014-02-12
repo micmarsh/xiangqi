@@ -50,11 +50,10 @@ makePieceView option =
                 biggerImage
             ]
 
-putTogether turn piece check =
+putTogether message piece  =
     flow down [
         rectSpacer,
-        turn,
-        check,
+        message,
         piece
     ]
 
@@ -100,5 +99,6 @@ makeSideBar {gameState, color, connected} =
         selectedPiece = lift .selected gameState
         pieceViews = lift makePieceView selectedPiece
         checkMessage = lift2 checkText (lift playerADT color) (lift .check gameState)
-        unsizedSidebar = lift3 putTogether titleViews pieceViews checkMessage
+        turnStatus = lift (flow down) <| lift2 (\u l -> [u, l]) titleViews checkMessage
+        unsizedSidebar = lift2 putTogether turnStatus pieceViews
     in lift (width sideBarWidth) unsizedSidebar
