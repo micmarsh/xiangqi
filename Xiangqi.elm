@@ -11,10 +11,12 @@ port inMoves : Signal {legal: Bool, move: {from: String, to: String}}
 port connected : Signal Bool
 port check : Signal {check: Bool, mate: Bool, checker: String}
 
+
+
 stateInputs = {
         color = color,
         moves = inMoves,
-        checkStatus = check
+        checkStatus = dropRepeats check
     }
 
 port outMoves : Signal {from : String, to : String}

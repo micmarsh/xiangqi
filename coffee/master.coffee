@@ -18,6 +18,7 @@ System.create 'master',
                     data: move
                 , master
             app.ports.state.subscribe (state) ->
+                console.log 'yo state updated'
                 legality.send
                     type: 'state'
                     data: state
