@@ -20,7 +20,7 @@ System.create 'legality', do ->
                 check =
                     check: checker.isCheck()
                     mate: checker.isCheckmate()
-                    checker: turn
+                    inCheck: turn
                 System.get('master').send
                     type: 'check'
                     data: check

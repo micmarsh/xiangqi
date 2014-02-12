@@ -104,8 +104,8 @@ renderCheckMateFor check =
         Just (CheckMate color) ->
             flow down [ 
                 (text . applyColor) "Checkmate!",
-                flow right [(if color == Red then redText "Red"
-                else blackText "Black"), greyText " wins!"]
+                flow right [(if color == Red then blackText "Black"
+                else  redText "Red"), greyText " wins!"]
             ]
         _ -> rectSpacer -- this will never happen
 
