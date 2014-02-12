@@ -1,7 +1,7 @@
 module Sidebar where
 
 --import GameState (gameState, playerColor)
-import Model (Red, Black, Piece, Color, playerADT, Check)
+import Model (Red, Black, Piece, Color, playerADT, Check, CheckMate)
 import Constants (sideBarWidth, squareSize)
 import Board (pieceImage)
 import Monad as M
@@ -62,28 +62,30 @@ makeTurnView gameState color  =
         turnText =  lift applyColor <| lift2 whoseTurn playerColor (lift .turn gameState)
     in lift turnMessage turnText
 
+colorText c = text . (color c) . toText
+redText = colorText red
+blackText = colorText black
+greyText = colorText darkGrey
+
 waiting = (text . applyColor) "Waiting for other player..."
-disconnected = (text . (color red) . toText) "Disconnected"
+disconnected =  redText "Disconnected"
 
 data Status = Waiting |
               Connected |
               Disconnected
 
-makeTitle : Element -> Status -> Element
 makeTitle turnView connected =
     case connected of
         Waiting -> waiting
         Connected -> turnView
         Disconnected -> disconnected
 
-updateStatus : Bool -> Status -> Status
 updateStatus new prev =
     if new then Connected
     else if prev == Waiting then Waiting
     else if prev == Connected then Disconnected
     else Disconnected
 
-checkText : Color -> Maybe Check -> Element
 checkText player check =
     let makeText = (text . applyColor)
     in case check of
@@ -92,13 +94,34 @@ checkText player check =
             else shortSpacer
         _ -> shortSpacer
 
+isCheckMate check = 
+    case check of
+        Just (CheckMate color) -> True
+        _ -> False
+
+renderCheckMateFor check =
+    case check of
+        Just (CheckMate color) ->
+            flow down [ 
+                (text . applyColor) "Checkmate!",
+                flow right [(if color == Red then redText "Red"
+                else blackText "Black"), greyText " wins!"]
+            ]
+        _ -> rectSpacer -- this will never happen
+
+decideMessage turnStatus check = 
+    if isCheckMate check then renderCheckMateFor check
+    else turnStatus
+
 makeSideBar {gameState, color, connected} =
     let turnViews = makeTurnView gameState color
         connStatus = foldp updateStatus Waiting connected
         titleViews = lift2 makeTitle turnViews connStatus
         selectedPiece = lift .selected gameState
         pieceViews = lift makePieceView selectedPiece
-        checkMessage = lift2 checkText (lift playerADT color) (lift .check gameState)
+        checkStatus = lift .check gameState
+        checkMessage = lift2 checkText (lift playerADT color) checkStatus
         turnStatus = lift (flow down) <| lift2 (\u l -> [u, l]) titleViews checkMessage
-        unsizedSidebar = lift2 putTogether turnStatus pieceViews
+        displayMessage = lift2 decideMessage turnStatus checkStatus
+        unsizedSidebar = lift2 putTogether displayMessage pieceViews
     in lift (width sideBarWidth) unsizedSidebar
