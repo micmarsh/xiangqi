@@ -63,9 +63,10 @@ checker.isLegal = isLegal = function (move, makingMove) {
     var to = move.to;
     var piece = position[from];
     if (legalPiece(piece)) {
-        if(piece.type === 'Cannon') {
-          console.log('wtf cannon');
-        }
+        // woah infinte loop going on somehow, maybe just on refresh?
+        // if(piece.type === 'Cannon') {
+        //   console.log('wtf cannon');
+        // }
       var moveList = piece.getMoves(position);
       if (moveList.indexOf(to) !== -1) {
         makeMove(piece, from, to);

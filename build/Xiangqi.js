@@ -47,10 +47,10 @@ Elm.Xiangqi.make = function (_elm) {
    var pieces2List = List.map(Parser.piece2List);
    var check = Native.Ports.portIn("check",
    Native.Ports.incomingSignal(function (v) {
-      return typeof v === "object" && "check" in v && "mate" in v && "checker" in v ? {_: {}
+      return typeof v === "object" && "check" in v && "mate" in v && "inCheck" in v ? {_: {}
                                                                                       ,check: typeof v.check === "boolean" ? _J.toBool(v.check) : _E.raise("invalid input, expecting JSBoolean but got " + v.check)
                                                                                       ,mate: typeof v.mate === "boolean" ? _J.toBool(v.mate) : _E.raise("invalid input, expecting JSBoolean but got " + v.mate)
-                                                                                      ,checker: typeof v.checker === "string" || typeof v.checker === "object" && v.checker instanceof String ? _J.toString(v.checker) : _E.raise("invalid input, expecting JSString but got " + v.checker)} : _E.raise("invalid input, expecting JSObject [\"check\",\"mate\",\"checker\"] but got " + v);
+                                                                                      ,inCheck: typeof v.inCheck === "string" || typeof v.inCheck === "object" && v.inCheck instanceof String ? _J.toString(v.inCheck) : _E.raise("invalid input, expecting JSString but got " + v.inCheck)} : _E.raise("invalid input, expecting JSObject [\"check\",\"mate\",\"inCheck\"] but got " + v);
    }));
    var connected = Native.Ports.portIn("connected",
    Native.Ports.incomingSignal(function (v) {
@@ -69,7 +69,7 @@ Elm.Xiangqi.make = function (_elm) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? _J.toString(v) : _E.raise("invalid input, expecting JSString but got " + v);
    }));
    var stateInputs = {_: {}
-                     ,checkStatus: check
+                     ,checkStatus: Signal.dropRepeats(check)
                      ,color: color
                      ,moves: inMoves};
    var outMoves = Native.Ports.portOut("outMoves",
@@ -173,6 +173,16 @@ Elm.Sidebar.make = function (_elm) {
    var Text = Elm.Text.make(_elm);
    var Time = Elm.Time.make(_elm);
    var _op = {};
+   var isCheckMate = function (check) {
+      return function () {
+         switch (check.ctor)
+         {case "Just":
+            switch (check._0.ctor)
+              {case "CheckMate": return true;}
+              break;}
+         return false;
+      }();
+   };
    var Disconnected = {ctor: "Disconnected"};
    var Connected = {ctor: "Connected"};
    var Waiting = {ctor: "Waiting"};
@@ -224,14 +234,12 @@ Elm.Sidebar.make = function (_elm) {
          "between lines 42 and 51");
       }();
    };
-   var putTogether = F3(function (turn,
-   piece,
-   check) {
+   var putTogether = F2(function (message,
+   piece) {
       return A2(Graphics.Element.flow,
       Graphics.Element.down,
       _J.toList([rectSpacer
-                ,turn
-                ,check
+                ,message
                 ,piece]));
    });
    var shortSpacer = spacerw(Constants.squareSize / 3 | 0);
@@ -309,9 +317,13 @@ Elm.Sidebar.make = function (_elm) {
          turnText);
       }();
    });
-   var disconnected = function ($) {
-      return Text.text(color(Color.red)(Text.toText($)));
-   }("Disconnected");
+   var colorText = function (c) {
+      return function ($) {
+         return Text.text(color(c)(Text.toText($)));
+      };
+   };
+   var redText = colorText(Color.red);
+   var disconnected = redText("Disconnected");
    var makeTitle = F2(function (turnView,
    connected) {
       return function () {
@@ -322,46 +334,82 @@ Elm.Sidebar.make = function (_elm) {
             return disconnected;
             case "Waiting": return waiting;}
          _E.Case($moduleName,
-         "between lines 75 and 78");
+         "between lines 78 and 81");
       }();
    });
-   var makeSideBar = function (_v11) {
+   var blackText = colorText(Color.black);
+   var greyText = colorText(darkGrey);
+   var renderCheckMateFor = function (check) {
+      return function () {
+         switch (check.ctor)
+         {case "Just":
+            switch (check._0.ctor)
+              {case "CheckMate":
+                 return A2(Graphics.Element.flow,
+                   Graphics.Element.down,
+                   _J.toList([function ($) {
+                                return Text.text(applyColor($));
+                             }("Checkmate!")
+                             ,A2(Graphics.Element.flow,
+                             Graphics.Element.right,
+                             _J.toList([_U.eq(check._0._0,
+                                       Model.Red) ? blackText("Black") : redText("Red")
+                                       ,greyText(" wins!")]))]));}
+              break;}
+         return rectSpacer;
+      }();
+   };
+   var decideMessage = F2(function (turnStatus,
+   check) {
+      return isCheckMate(check) ? renderCheckMateFor(check) : turnStatus;
+   });
+   var makeSideBar = function (_v17) {
       return function () {
          return function () {
+            var checkStatus = A2(Signal.lift,
+            function (_) {
+               return _.check;
+            },
+            _v17.gameState);
             var checkMessage = A3(Signal.lift2,
             checkText,
             A2(Signal.lift,
             Model.playerADT,
-            _v11.color),
-            A2(Signal.lift,
-            function (_) {
-               return _.check;
-            },
-            _v11.gameState));
+            _v17.color),
+            checkStatus);
             var selectedPiece = A2(Signal.lift,
             function (_) {
                return _.selected;
             },
-            _v11.gameState);
+            _v17.gameState);
             var pieceViews = A2(Signal.lift,
             makePieceView,
             selectedPiece);
             var connStatus = A3(Signal.foldp,
             updateStatus,
             Waiting,
-            _v11.connected);
+            _v17.connected);
             var turnViews = A2(makeTurnView,
-            _v11.gameState,
-            _v11.color);
+            _v17.gameState,
+            _v17.color);
             var titleViews = A3(Signal.lift2,
             makeTitle,
             turnViews,
             connStatus);
-            var unsizedSidebar = A4(Signal.lift3,
-            putTogether,
+            var turnStatus = Signal.lift(Graphics.Element.flow(Graphics.Element.down))(A3(Signal.lift2,
+            F2(function (u,l) {
+               return _J.toList([u,l]);
+            }),
             titleViews,
-            pieceViews,
-            checkMessage);
+            checkMessage));
+            var displayMessage = A3(Signal.lift2,
+            decideMessage,
+            turnStatus,
+            checkStatus);
+            var unsizedSidebar = A3(Signal.lift2,
+            putTogether,
+            displayMessage,
+            pieceViews);
             return A2(Signal.lift,
             Graphics.Element.width(Constants.sideBarWidth),
             unsizedSidebar);
@@ -381,11 +429,18 @@ Elm.Sidebar.make = function (_elm) {
                          ,makePieceView: makePieceView
                          ,putTogether: putTogether
                          ,makeTurnView: makeTurnView
+                         ,colorText: colorText
+                         ,redText: redText
+                         ,blackText: blackText
+                         ,greyText: greyText
                          ,waiting: waiting
                          ,disconnected: disconnected
                          ,makeTitle: makeTitle
                          ,updateStatus: updateStatus
                          ,checkText: checkText
+                         ,isCheckMate: isCheckMate
+                         ,renderCheckMateFor: renderCheckMateFor
+                         ,decideMessage: decideMessage
                          ,makeSideBar: makeSideBar
                          ,Waiting: Waiting
                          ,Connected: Connected
@@ -636,7 +691,7 @@ Elm.GameState.make = function (_elm) {
    _v0) {
       return function () {
          return function () {
-            var color = Model.playerADT(_v0.checker);
+            var color = Model.playerADT(_v0.inCheck);
             return _v0.mate ? Maybe.Just(Model.CheckMate(color)) : _v0.check ? Maybe.Just(Model.Check(color)) : Maybe.Nothing;
          }();
       }();

@@ -6,7 +6,7 @@ System.create 'master',
                 legal: false,
                 move: {from: '0,0', to: '0,0'}
             connected: false
-            check: {check: false, mate: false, checker: 'red'}
+            check: {check: false, mate: false, inCheck: 'red'}
 
         System.later ->
             legality = System.get 'legality'
@@ -18,6 +18,7 @@ System.create 'master',
                     data: move
                 , master
             app.ports.state.subscribe (state) ->
+                console.log 'yo state updated'
                 legality.send
                     type: 'state'
                     data: state

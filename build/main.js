@@ -205,7 +205,7 @@
           check = {
             check: checker.isCheck(),
             mate: checker.isCheckmate(),
-            checker: turn
+            inCheck: turn
           };
           return System.get('master').send({
             type: 'check',
@@ -261,7 +261,7 @@
       check: {
         check: false,
         mate: false,
-        checker: 'red'
+        inCheck: 'red'
       }
     });
     System.later(function() {
@@ -276,6 +276,7 @@
         }, master);
       });
       return app.ports.state.subscribe(function(state) {
+        console.log('yo state updated');
         return legality.send({
           type: 'state',
           data: state
@@ -1081,9 +1082,10 @@ checker.isLegal = isLegal = function (move, makingMove) {
     var to = move.to;
     var piece = position[from];
     if (legalPiece(piece)) {
-        if(piece.type === 'Cannon') {
-          console.log('wtf cannon');
-        }
+        // woah infinte loop going on somehow, maybe just on refresh?
+        // if(piece.type === 'Cannon') {
+        //   console.log('wtf cannon');
+        // }
       var moveList = piece.getMoves(position);
       if (moveList.indexOf(to) !== -1) {
         makeMove(piece, from, to);
