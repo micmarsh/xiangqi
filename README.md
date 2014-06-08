@@ -6,7 +6,7 @@ Chinese chess in ClojureScript
 
 In addition to lein stuff, you'll want to 
 
-`npm install -g uglifyjs`
+`npm install -g uglify-js`
 
 and
 
