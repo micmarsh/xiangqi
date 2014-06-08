@@ -34,6 +34,4 @@
     (fn [row column text]
         (swap! pieces 
             (fn [pieces]
-                (let [row-vec (pieces row)]
-                    (assoc pieces row 
-                        (assoc row-vec column text)))))))
+                (assoc-in pieces [row column] text)))))
