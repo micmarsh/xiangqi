@@ -15,7 +15,8 @@
             [:tr
                 (for [[square column] (enumerate row)]
                     ^{:key [index column]} ; later: the actual row-col position, that won't ever change
-                    [:td [:img {:src "assets/red/cannon.png"}]])])])
+                    [:td 
+                        [:img {:src "assets/red/cannon.png"}]])])])
 
 (def pieces (r/atom (vec (for [row (range 8)] 
                         (vec (for [column (range 8)] 
