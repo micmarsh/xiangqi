@@ -9,14 +9,6 @@
 
 (def find-piece (partial get-piece (:player-color @game-info)))
 
-(defn game->board [game]
-    (vec (for [row (range 8)] 
-        (vec (for [column (range 8)
-                   piece [(find-piece row column (.-position game))]] 
-                    (if (js/Boolean piece) 
-                        (piece->clj piece)
-                        (square position)))))))
-
 (defn square [pos]
     {
         :position pos 
@@ -29,6 +21,14 @@
         :color (.-color piece)
         :position (-> piece .-square .-coordinates)
     })
+
+(defn game->board [game]
+    (vec (for [row (range 8)] 
+        (vec (for [column (range 8)
+                   piece [(find-piece row column (.-position game))]] 
+                    (if (js/Boolean piece) 
+                        (piece->clj piece)
+                        (square piece)))))))
 
 (defn piece? [{:keys [color name]}]
     (every? js/Boolean [color name]))

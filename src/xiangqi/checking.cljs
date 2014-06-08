@@ -9,5 +9,5 @@
 (go-loop [ ]
     (let [square (<! square-clicks)]
         (println square)
-        (loop)))
+        (recur)))
 
