@@ -23,7 +23,7 @@
         (slice-from 1) 
         (swap! game-info assoc :game-id)))
 
-(defn color-key [id]
+(defn color-key [game-id]
     (str game-id "-player-color"))
 
 (defn get-color [window game-id] 
@@ -36,7 +36,7 @@
 (defn has-color? [window]
     (let [game-id (get-id window)]
         (-> window 
-            (get-color window game-id) 
+            (get-color game-id) 
             js/Boolean)))
 
 (defn set-color! [window player-color]
@@ -51,19 +51,17 @@
         (swap! game-info assoc :player-color color)))
 
 (defn color-checking! [window default]
-    (println (get-id window))
     (if (has-color? window)
         (register-color! window game-info)
         (do
             (set-color! window default)
             (register-color! window game-info))))
 
-(let [window js/window]
-    (if (has-hash? window)
-        (do 
-            (register-hash! window game-info)
-            (color-checking! window "black"))
-        (do 
-            (set-hash! js/window (new-id))
-            (color-checking! window "red")
-            (register-hash! window game-info))))
+(if (has-hash? js/window)
+    (do 
+        (register-hash! js/window game-info)
+        (color-checking! js/window "black"))
+    (do 
+        (set-hash! js/window (new-id))
+        (color-checking! js/window "red")
+        (register-hash! js/window game-info)))
