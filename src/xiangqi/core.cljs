@@ -3,16 +3,19 @@
 
 (set! *print-fn* #(.log js/console %))
 
+(def numbers (iterate inc 0))
+(defn enumerate [sequence]
+    (map (fn [item index] [item index])
+        sequence numbers))
+
 (defn main-view [pieces]
     [:table 
-        (for [[row index] (map #(identity [%1 %2]) @pieces (range (count @pieces)))]
+        (for [[row index] (enumerate @pieces)]
            ^{:key index} ; later: the actual index, row-col type  
             [:tr
-                (for [square row]
-                    ^{:key square} ; later: the actual row-col position, that won't ever change
-                    [:td (or square "yo")])
-            ]
-            )])
+                (for [[square column] (enumerate row)]
+                    ^{:key [index column]} ; later: the actual row-col position, that won't ever change
+                    [:td (or square "yo")])])])
 
 (def pieces (r/atom (vec (for [row (range 8)] 
                         (vec (for [column (range 8)] 
@@ -24,8 +27,6 @@
 
 (aset js/window "setText" (fn [row column text]
     (swap! pieces (fn [pieces]
-                    (println pieces)
                     (let [row-vec (pieces row)]
-                        (println row-vec row column)
                         (assoc pieces row 
                             (assoc row-vec column text)))))))
