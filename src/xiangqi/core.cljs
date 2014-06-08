@@ -5,8 +5,8 @@
 
 (defn main-view [pieces]
     [:table 
-        (for [row @pieces]
-           ^{:key row} ; later: the actual index, row-col type  
+        (for [[row index] (map #(identity [%1 %2]) @pieces (range (count @pieces)))]
+           ^{:key index} ; later: the actual index, row-col type  
             [:tr
                 (for [square row]
                     ^{:key square} ; later: the actual row-col position, that won't ever change
@@ -15,7 +15,7 @@
             )])
 
 (def pieces (r/atom (vec (for [row (range 8)] 
-                        (vec (for [ column (range 8)] 
+                        (vec (for [column (range 8)] 
                             (str row "," column)))))))
 
 (r/render-component
@@ -24,6 +24,8 @@
 
 (aset js/window "setText" (fn [row column text]
     (swap! pieces (fn [pieces]
+                    (println pieces)
                     (let [row-vec (pieces row)]
                         (println row-vec row column)
-                        (assoc pieces row (assoc row-vec column text)))))))
+                        (assoc pieces row 
+                            (assoc row-vec column text)))))))
