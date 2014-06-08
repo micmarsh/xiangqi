@@ -28,7 +28,7 @@
                    piece [(find-piece row column (.-position game))]] 
                     (if (js/Boolean piece) 
                         (piece->clj piece)
-                        (square piece)))))))
+                        (square (str column "," row))))))))
 
 (defn piece? [{:keys [color name]}]
     (every? js/Boolean [color name]))
