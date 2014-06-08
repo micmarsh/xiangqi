@@ -1,10 +1,8 @@
 (ns xiangqi.core
     (:require [reagent.core :as r]
               [xiangqi.game :refer [game->board piece?]]
-              [xiangqi.checking :refer [square-clicks]]
+              [xiangqi.checking :refer [game square-clicks]]
               [cljs.core.async :refer [put!]]))
-
-(def game (js/Game.))
 
 (set! *print-fn* #(.log js/console %))
 

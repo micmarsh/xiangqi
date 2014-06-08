@@ -4,6 +4,8 @@
 
 (set! *print-fn* #(.log js/console %))
 
+(def game (js/Game.))
+
 (def square-clicks (chan))
 
 (go-loop [ ]
