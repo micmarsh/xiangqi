@@ -1,6 +1,8 @@
-(ns xiangqi.core)
+(ns xiangqi.core
+    (:require [reagent.core :as r]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn main-view [pieces])
+
+(r/render-component
+    [main-view (r/atom { })] 
+    (.getElementById js/document "main"))
