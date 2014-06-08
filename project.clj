@@ -13,6 +13,6 @@
   :cljsbuild
       {:builds [{:source-paths ["src/xiangqi"]
                    :compiler
-                     {:preamble ["reagent/react.min.js"]
+                     {:preamble ["reagent/react.js"]
                       :output-to "resources/main.js"
                       :pretty-print true}}]})
