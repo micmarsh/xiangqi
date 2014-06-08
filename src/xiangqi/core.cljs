@@ -18,8 +18,6 @@
             [:tr
                 (for [[square column] (enumerate row)]
                     ^{:key [index column]} 
-                    ; TODO "square" means piece right now should be another kind
-                    ; of squaure object that could possibly go here
                     [:td 
                     (when (piece? square)
                         [:img
