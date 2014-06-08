@@ -1,6 +1,8 @@
 (ns xiangqi.info
     (:use-macros [xiangqi.macros :only [get-hash]]))
 
+(set! *print-fn* #(.log js/console %))
+
 (defn new-id []
     (-> (.random js/Math)
         .toString
@@ -10,7 +12,7 @@
     (-> window get-hash (not= "")))
 
 (defn set-hash! [window id]
-    (set! (get-hash window) id))
+    (-> window get-hash (set! id)))
 
 (def game-info (atom { }))
 
@@ -24,25 +26,44 @@
 (defn color-key [id]
     (str game-id "-player-color"))
 
-(defn get-color [window]
+(defn get-color [window game-id] 
     (-> window 
         .-localStorage 
         (aget (color-key game-id))))
 
-(defn has-color? [window game-id]
-    (-> window get-color js/Boolean)
+(def get-id #(.slice (get-hash %) 1))
 
-(defn set-color! [window id player-color]
-    (aset (.-localStorage window)
-        (color-key id)
-        player-color))
+(defn has-color? [window]
+    (let [game-id (get-id window)]
+        (-> window 
+            (get-color window game-id) 
+            js/Boolean)))
 
-(defn register-color! [window]
-    (let [color (get-color window)]
+(defn set-color! [window player-color]
+    (let [id (get-id window)]
+        (aset (.-localStorage window)
+            (color-key id)
+            player-color)))
+
+(defn register-color! [window game-info]
+    (let [game-id (get-id window)
+          color (get-color window game-id)]
         (swap! game-info assoc :player-color color)))
 
-(if (has-hash? js/window)
-    (register-hash! js/window game-info)
-    (do 
-        (set-hash! js/window (new-id))
-        (register-hash! js/window) game-info))
+(defn color-checking! [window default]
+    (println (get-id window))
+    (if (has-color? window)
+        (register-color! window game-info)
+        (do
+            (set-color! window default)
+            (register-color! window game-info))))
+
+(let [window js/window]
+    (if (has-hash? window)
+        (do 
+            (register-hash! window game-info)
+            (color-checking! window "black"))
+        (do 
+            (set-hash! js/window (new-id))
+            (color-checking! window "red")
+            (register-hash! window game-info))))
