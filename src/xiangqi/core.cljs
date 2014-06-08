@@ -1,6 +1,8 @@
 (ns xiangqi.core
     (:require [reagent.core :as r]
-              [xiangqi.game :refer [game->board piece?]]))
+              [xiangqi.game :refer [game->board piece?]]
+              [xiangqi.checking :refer [square-clicks]]
+              [cljs.core.async :refer [put!]]))
 
 (def game (js/Game.))
 
@@ -18,10 +20,11 @@
             [:tr
                 (for [[square column] (enumerate row)]
                     ^{:key [index column]} 
-                    [:td 
+                    [:td {:on-click #(put! square-clicks square)}
                     (when (piece? square)
                         [:img
-                            {:src (str "assets/" (:color square) "/" 
+                            {:src (str "assets/" 
+                                    (:color square) "/" 
                                     (:name square) ".png")}])])])])
 
 (def pieces (-> game game->board atom))
