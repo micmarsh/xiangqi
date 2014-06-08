@@ -15,4 +15,4 @@
                    :compiler
                      {:preamble ["reagent/react.min.js"]
                       :output-to "resources/main.js"
-                      :pretty-print true}}]}))
+                      :pretty-print true}}]})
