@@ -1,6 +1,6 @@
 (ns xiangqi.core
     (:require [reagent.core :as r]
-              [xiangqi.game :refer [game->board]]))
+              [xiangqi.game :refer [game->board piece?]]))
 
 (def game (js/Game.))
 
@@ -18,10 +18,13 @@
             [:tr
                 (for [[square column] (enumerate row)]
                     ^{:key [index column]} 
-                    ; TODO "square" means piece right now. Also, player color
-                    [:td [:img
-                        {:src (str "assets/" (:color square) "/" 
-                                (:name square) ".png")}]])])])
+                    ; TODO "square" means piece right now should be another kind
+                    ; of squaure object that could possibly go here
+                    [:td 
+                    (when (piece? square)
+                        [:img
+                            {:src (str "assets/" (:color square) "/" 
+                                    (:name square) ".png")}])])])])
 
 (def pieces (-> game game->board atom))
 
