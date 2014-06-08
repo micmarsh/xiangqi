@@ -9,15 +9,13 @@
         sequence numbers))
 
 (defn main-view [pieces]
-    [:div
-     [:img#board {:src "assets/board.jpg"}]
-     [:table 
+    [:table 
         (for [[row index] (enumerate @pieces)]
            ^{:key index} ; later: the actual index, row-col type  
             [:tr
                 (for [[square column] (enumerate row)]
                     ^{:key [index column]} ; later: the actual row-col position, that won't ever change
-                    [:td [:img {:src "assets/red/cannon.png"}]])])]])
+                    [:td [:img {:src "assets/red/cannon.png"}]])])])
 
 (def pieces (r/atom (vec (for [row (range 8)] 
                         (vec (for [column (range 8)] 
