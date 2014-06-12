@@ -1,6 +1,6 @@
 (ns xiangqi.core
     (:require [reagent.core :as r]
-              [xiangqi.game :refer [game->board piece?]]
+              [xiangqi.game :refer [game->clj piece?]]
               [xiangqi.checking :refer [game square-clicks]]
               [cljs.core.async :refer [put!]]))
 
@@ -25,7 +25,7 @@
                                     (:color square) "/" 
                                     (:name square) ".png")}])])])])
 
-(def pieces (-> game game->board atom))
+(def pieces (-> game game->clj atom))
 
 (r/render-component
     [main-view pieces] 
