@@ -1,13 +1,8 @@
 (ns xiangqi.game
     (:require [xiangqi.info :refer [game-info]]))
 
-(defn get-piece [player row column pieces]
-    (let [offset? (= player "red")
-          row (if offset? (- 7 row) row)
-          column (if offset? (- 7 column) column)]
-        (aget pieces (str column "," row))))
-
-(def find-piece (partial get-piece (:player-color @game-info)))
+(defn get-piece [row column pieces]
+    (aget pieces (str column "," row))) 
 
 (defn square [pos]
     {
@@ -22,10 +17,17 @@
         :position (-> piece .-square .-coordinates)
     })
 
+(def ranges {
+    "black" (range 8)
+    "red" (range 7 -1 -1)
+    })
+
+(def player-range (ranges (@game-info :player-color)))
+
 (defn game->board [game]
-    (vec (for [row (range 8)] 
-        (vec (for [column (range 8)
-                   piece [(find-piece row column (.-position game))]] 
+    (vec (for [row player-range] 
+        (vec (for [column player-range
+                   piece [(get-piece row column (.-position game))]] 
                     (if (js/Boolean piece) 
                         (piece->clj piece)
                         (square (str column "," row))))))))
