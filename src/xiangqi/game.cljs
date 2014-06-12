@@ -40,6 +40,9 @@
                         (piece->clj piece)
                         (square (str column "," row))))))))
 
+(defn piece? [{:keys [color name]}]
+    (every? js/Boolean [color name]))
+
 (defn clj->game [board turn]
     (let [game (js/Game.)
           position (js/Position.)]
@@ -51,6 +54,3 @@
         (set! (.-toMove position) turn)
         (.importPosition game position)
         game)) 
-
-(defn piece? [{:keys [color name]}]
-    (every? js/Boolean [color name]))
